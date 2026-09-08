@@ -1,0 +1,30 @@
+﻿@model Plan
+@{
+    ViewData["Title"] = "Create Plan";
+}
+
+<h1>Create Plan</h1>
+
+<div class="container">
+
+    <form asp-action="Create" method="post">
+        <div class="form-group">
+            <label class="control-label">Name</label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Price</label>
+            <input asp-for="Price" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label class="control-label">Description</label>
+            <input asp-for="Description" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </form>
+
+</div>
+
