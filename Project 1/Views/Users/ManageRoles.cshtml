@@ -1,0 +1,64 @@
+﻿﻿@using Project_1.Dtos
+
+@model UserRolesVM
+
+@{
+    ViewData["Title"] = "Manage User Roles";
+}
+
+<div class="container mt-4">
+
+    <div class="card">
+
+        <div class="card-header bg-primary text-white">
+            <h4>Manage Roles</h4>
+        </div>
+
+        <div class="card-body">
+
+            <h5 class="mb-4">
+                User: @Model.UserName
+            </h5>
+
+            <form asp-action="ManageRoles" method="post">
+
+                <input type="hidden"
+                       asp-for="UserId" />
+
+                @for (int i = 0; i < Model.Roles.Count; i++)
+                {
+                    <div class="form-check mb-3">
+
+                        <input type="hidden"
+                               asp-for="Roles[i].RoleId" />
+
+                        <input class="form-check-input"
+                               asp-for="Roles[i].IsSelected" />
+
+                        <label class="form-check-label"
+                               asp-for="Roles[i].IsSelected">
+
+                            @Model.Roles[i].RoleName
+
+                        </label>
+
+                    </div>
+                }
+
+                <button type="submit"
+                        class="btn btn-success">
+                    Save Roles
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+                    Back
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

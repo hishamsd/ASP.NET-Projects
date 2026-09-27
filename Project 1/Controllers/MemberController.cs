@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Project_1.Data;
@@ -6,6 +7,7 @@ using Project_1.Models;
 
 namespace Project_1.Controllers
 {
+    //[Authorize]
     public class MemberController : Controller
     {
 
@@ -18,7 +20,7 @@ namespace Project_1.Controllers
 
         public IActionResult Index()
         {
-            var members = _db.Members.Include(m => m.Plan).ToList();
+            var members = _db.Members.ToList();
             return View(members);
         }
         [HttpGet]
@@ -54,7 +56,7 @@ namespace Project_1.Controllers
             {
                 return NotFound();
             }
-            ViewBag.Plans = new SelectList(_db.Plans.ToList(), "Id", "Name", member.PlanId);
+            ViewBag.Plans = new SelectList(_db.Plans.ToList(), "Id", "Name");
             return View(member);
         }
 

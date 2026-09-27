@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Member>
+﻿@using Project_1.Dtos.GymDtos
+@model IEnumerable<MemberDto>
 
 @{
     ViewData["Title"] = "Member Page";
@@ -25,11 +26,7 @@
                 </th>
                 <th>
                    PhoneNumber
-                </th>
-                
-                <th>
-                   Plan
-                </th>
+                </th> 
                 <th>Actions</th>
             </tr>
         </thead>
@@ -47,9 +44,7 @@
                     <td>
                         @name.PhoneNumber
                     </td>
-                    <td>
-                        @name.Plan?.Name
-                    </td>
+                    
                     <td>
                         <a asp-action="Edit" asp-route-id="@name.Id" class="btn btn-warning">Edit</a>
 
@@ -57,27 +52,27 @@
                             Delete
                         </button>
 
-                        <div class="modal fade" id="deleteModal-@name.Id" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Delete Confirmation</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Are you sure you want to delete <strong>@name.Name</strong>?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <form asp-action="Delete" asp-route-id="@name.Id" method="post" style="display:inline;">
-                                            <button type="submit" class="btn btn-danger">Confirm Delete</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
+                   <div class="modal fade" id="deleteModal-@name.Id" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                     <div class="modal-header">
+                           <h5 class="modal-title">Delete Confirmation</h5>
+                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                        <div class="modal-body">
+                         Are you sure you want to delete <strong>@name.Name</strong>?
+                          </div>
+                                 <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+    <form asp-controller="Members" asp-action="Delete" asp-route-id="@name.Id" method="post" style="display:inline;">
+        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+    </form>
+</div>
+ </div>
+    </div>
+      </div>
+           </td>
+          </tr>
             }
         </tbody>
     </table>

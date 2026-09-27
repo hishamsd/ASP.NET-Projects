@@ -18,12 +18,7 @@
             <input asp-for="PhoneNumber" class="form-control" />
         </div>
      
-        <div class="form-group">
-            <label class="control-label">Plan</label>
-            <select asp-for="PlanId" class="form-control" asp-items="ViewBag.Plans">
-                <option value="">-- Select Plan --</option>
-            </select>
-        </div>
+     
         <div class="form-group">
             <input type="submit" value="Save" class="btn btn-primary" />
             <a asp-action="Index" class="btn btn-secondary">Back to List</a>
