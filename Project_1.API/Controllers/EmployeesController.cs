@@ -3,48 +3,48 @@ using Microsoft.AspNetCore.Mvc;
 using Project_1.Application.Dtos.HRDtos;
 using Project_1.Application.Services.Base;
 
-namespace Project_1.API.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class EmployeesController : ControllerBase
+namespace Project_1.API.Controllers
 {
-    private readonly IEmployeeService _service;
-    public EmployeesController(IEmployeeService service) => _service = service;
-
-    [HttpGet]
-    [Authorize(Policy = "Read")]
-    public IActionResult GetAll() => Ok(_service.GetEmployeesImprove());
-
-    [HttpGet("{id:int}")]
-    [Authorize(Policy = "Read")]
-    public IActionResult GetById(int id)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class EmployeesController : ControllerBase
     {
-        var item = _service.GetEmployeesImprove().FirstOrDefault(employee => employee.Id == id);
-        return item == null ? NotFound() : Ok(item);
-    }
+        private readonly IEmployeeService _employeeService;
 
-    [HttpPost]
-    [Authorize(Policy = "Create")]
-    [ValidateAntiForgeryToken]
-    public IActionResult Create([FromForm] CreateEmployeeDto dto)
-    {
-        try { _service.CreateEmployee(dto); }
-        catch (ArgumentException ex) { return BadRequest(ex.Message); }
-        return StatusCode(StatusCodes.Status201Created);
-    }
+        public EmployeesController(IEmployeeService employeeService)
+        {
+            _employeeService = employeeService;
+        }
 
-    [HttpPut("{id:int}")]
-    [Authorize(Policy = "Edit")]
-    [ValidateAntiForgeryToken]
-    public IActionResult Edit(int id, [FromForm] CreateEmployeeDto dto)
-    {
-        try { return _service.UpdateEmployee(id, dto) ? NoContent() : NotFound(); }
-        catch (ArgumentException ex) { return BadRequest(ex.Message); }
-    }
+        [HttpGet("GetEmployees")]
+        [Authorize(Policy = "Read")]
+        public IActionResult Emp(string? name = null)
+        {
+            try
+            {
+                var employees = _employeeService.GetEmployeesImprove();
+                return Ok(employees);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-    [HttpDelete("{id:int}")]
-    [Authorize(Policy = "Delete")]
-    [ValidateAntiForgeryToken]
-    public IActionResult Delete(int id) => _service.DeleteEmployee(id) ? NoContent() : NotFound();
+        [HttpPost]
+        [Authorize(Policy = "Create")]
+        [ValidateAntiForgeryToken]
+        public IActionResult CreateEmployee([FromForm] CreateEmployeeDto createEmployeeDto)
+        {
+            try
+            {
+                _employeeService.CreateEmployee(createEmployeeDto);
+                return Ok("Data Added");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+    }
 }

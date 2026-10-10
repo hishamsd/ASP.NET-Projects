@@ -35,8 +35,6 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultDatabase")));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-builder.Services.AddScoped<IJobService, JobService>();
-builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -58,7 +56,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 builder.Services.AddAuthorization(options =>
 {
-    foreach (var permission in new[] { "Read", "Create", "Edit", "Delete" })
+    foreach (var permission in new[] { "Read", "Create" })
     {
         options.AddPolicy(permission, policy => policy.RequireAuthenticatedUser()
             .RequireClaim("Permission", "Read").RequireClaim("Permission", permission));
