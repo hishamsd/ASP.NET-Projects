@@ -1,4 +1,4 @@
-﻿namespace Project_1.Dtos
+﻿namespace Project_1.Application.Dtos
 {
     public class RoleDto
     {

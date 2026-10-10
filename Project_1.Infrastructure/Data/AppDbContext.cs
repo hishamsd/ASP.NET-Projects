@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Project_1.Models;
+using Project_1.Domain.Models;
 
 
 
-namespace Project_1.Data
+namespace Project_1.Infrastructure.Data
 {
     public class AppDbContext : DbContext
     {

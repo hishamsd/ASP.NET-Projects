@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using Project_1.Models;
+using Project_1.Domain.Models;
 using Microsoft.AspNetCore.Http;
-namespace Project_1.Dtos.UsersDtos
+namespace Project_1.Application.Dtos.UsersDtos
 {
     public class CreateUserDto
     {

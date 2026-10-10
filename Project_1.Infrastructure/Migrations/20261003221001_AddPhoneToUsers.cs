@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Project_1.Migrations
+namespace Project_1.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class AddPhoneToUsers : Migration

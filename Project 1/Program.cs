@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
-using Project_1.Data;
-using Project_1.Repositories;
-using Project_1.Repositories.Base;
-using Project_1.Services;
-using Project_1.Services.Base;
+using Project_1.Infrastructure.Data;
+using Project_1.Infrastructure.Repositories;
+using Project_1.Infrastructure.Repositories.Base;
+using Project_1.Application.Services;
+using Project_1.Application.Services.Base;
 
 var builder = WebApplication.CreateBuilder(args);
 

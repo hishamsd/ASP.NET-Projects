@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Project_1.Dtos.HRDtos;
+using Project_1.Application.Dtos.HRDtos;
 using Project_1.Domain.Models;
-using Project_1.Repositories.Base;
-using Project_1.Services.Base;
+using Project_1.Infrastructure.Repositories.Base;
+using Project_1.Application.Services.Base;
 
-namespace Project_1.Services
+namespace Project_1.Application.Services
 {
     public class EmployeeService : IEmployeeService
     {

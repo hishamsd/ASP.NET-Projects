@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Project_1.Dtos;
-using Project_1.Dtos.UsersDtos;
-using Project_1.Models;
-using Project_1.Services.Base;
+using Project_1.Application.Dtos;
+using Project_1.Application.Dtos.UsersDtos;
+using Project_1.Domain.Models;
+using Project_1.Application.Services.Base;
 
 namespace Project_1.Controllers
 {

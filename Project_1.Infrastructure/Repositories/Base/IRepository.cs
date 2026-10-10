@@ -1,4 +1,4 @@
-﻿namespace Project_1.Repositories.Base
+﻿namespace Project_1.Infrastructure.Repositories.Base
 {
     public interface IRepository<T> where T : class
     {

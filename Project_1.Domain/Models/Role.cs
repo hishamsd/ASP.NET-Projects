@@ -1,4 +1,4 @@
-﻿namespace Project_1.Domain.Models;
+﻿namespace Project_1.Domain.Models
 {
     public class Role
     {

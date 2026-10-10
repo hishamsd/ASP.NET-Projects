@@ -1,4 +1,4 @@
-﻿namespace Project_1.Dtos.HRDtos
+﻿namespace Project_1.Application.Dtos.HRDtos
 {
     public class JobDto
     {

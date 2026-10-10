@@ -1,4 +1,4 @@
-﻿namespace Project_1.Dtos.GymDtos
+﻿namespace Project_1.Application.Dtos.GymDtos
 {
     public class MemberDto
     {

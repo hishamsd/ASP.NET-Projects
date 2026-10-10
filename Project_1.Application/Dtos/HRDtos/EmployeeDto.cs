@@ -2,9 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Http;
-using Project_1.Models;
+using Project_1.Domain.Models;
 
-namespace Project_1.Dtos.HRDtos
+namespace Project_1.Application.Dtos.HRDtos
 {
     public class EmployeeDto
     {

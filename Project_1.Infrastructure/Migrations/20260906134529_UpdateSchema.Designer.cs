@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Project_1.Data;
+using Project_1.Infrastructure.Data;
 
 #nullable disable
 
-namespace Project_1.Migrations
+namespace Project_1.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20260906134529_UpdateSchema")]
@@ -25,7 +25,7 @@ namespace Project_1.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Project_1.Models.Member", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Member", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -51,7 +51,7 @@ namespace Project_1.Migrations
                     b.ToTable("Members");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Plan", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Plan", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -74,16 +74,16 @@ namespace Project_1.Migrations
                     b.ToTable("Plans");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Member", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Member", b =>
                 {
-                    b.HasOne("Project_1.Models.Plan", "Plan")
+                    b.HasOne("Project_1.Domain.Models.Plan", "Plan")
                         .WithMany("Members")
                         .HasForeignKey("PlanId");
 
                     b.Navigation("Plan");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Plan", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Plan", b =>
                 {
                     b.Navigation("Members");
                 });

@@ -1,6 +1,6 @@
-﻿using Project_1.Data;
+﻿using Project_1.Infrastructure.Data;
 
-namespace Project_1.Repositories.Base
+namespace Project_1.Infrastructure.Repositories.Base
 {
     public class UnitOfWork : IUnitOfWork
     {

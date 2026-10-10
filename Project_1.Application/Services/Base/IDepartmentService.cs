@@ -1,6 +1,6 @@
-﻿using Project_1.Dtos.HRDtos;
+﻿using Project_1.Application.Dtos.HRDtos;
 
-namespace Project_1.Services.Base
+namespace Project_1.Application.Services.Base
 {
     public interface IDepartmentService
     {

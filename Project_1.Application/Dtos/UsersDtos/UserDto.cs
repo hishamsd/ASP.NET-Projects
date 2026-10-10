@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-namespace Project_1.Dtos.UsersDtos
+namespace Project_1.Application.Dtos.UsersDtos
 {
     public class UserDto
     {

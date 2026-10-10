@@ -17,4 +17,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Project_1.Domain\Project_1.Domain.csproj" />
+    <ProjectReference Include="..\Project_1.Application\Project_1.Application.csproj" />
+    <ProjectReference Include="..\Project_1.Infrastructure\Project_1.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

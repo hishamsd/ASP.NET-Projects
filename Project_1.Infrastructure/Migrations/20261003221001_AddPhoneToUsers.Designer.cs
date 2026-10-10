@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Project_1.Data;
+using Project_1.Infrastructure.Data;
 
 #nullable disable
 
-namespace Project_1.Migrations
+namespace Project_1.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20261003221001_AddPhoneToUsers")]
@@ -40,7 +40,7 @@ namespace Project_1.Migrations
                     b.ToTable("PermissionRole");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Department", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Department", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -61,7 +61,7 @@ namespace Project_1.Migrations
                     b.ToTable("Departments");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Employee", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Employee", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -103,7 +103,7 @@ namespace Project_1.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Job", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Job", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -129,7 +129,7 @@ namespace Project_1.Migrations
                     b.ToTable("Jobs");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Member", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Member", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -159,7 +159,7 @@ namespace Project_1.Migrations
                     b.ToTable("Members");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Permission", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Permission", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -180,7 +180,7 @@ namespace Project_1.Migrations
                     b.ToTable("Permissions");
                 });
 
-            modelBuilder.Entity("Project_1.Models.PermissionRoles", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.PermissionRoles", b =>
                 {
                     b.Property<int>("PermissionsId")
                         .HasColumnType("int");
@@ -195,7 +195,7 @@ namespace Project_1.Migrations
                     b.ToTable("PermissionRoles");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Plan", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Plan", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -222,7 +222,7 @@ namespace Project_1.Migrations
                     b.ToTable("Plans");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Role", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -243,7 +243,7 @@ namespace Project_1.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("Project_1.Models.RoleUser", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.RoleUser", b =>
                 {
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
@@ -258,7 +258,7 @@ namespace Project_1.Migrations
                     b.ToTable("RoleUsers");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Subscribe", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Subscribe", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -292,7 +292,7 @@ namespace Project_1.Migrations
                     b.ToTable("Subscriptions");
                 });
 
-            modelBuilder.Entity("Project_1.Models.User", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -340,7 +340,7 @@ namespace Project_1.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Project_1.Models.UserFile", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.UserFile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -387,28 +387,28 @@ namespace Project_1.Migrations
 
             modelBuilder.Entity("PermissionRole", b =>
                 {
-                    b.HasOne("Project_1.Models.Permission", null)
+                    b.HasOne("Project_1.Domain.Models.Permission", null)
                         .WithMany()
                         .HasForeignKey("PermissionsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Project_1.Models.Role", null)
+                    b.HasOne("Project_1.Domain.Models.Role", null)
                         .WithMany()
                         .HasForeignKey("RolesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Project_1.Models.Employee", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Employee", b =>
                 {
-                    b.HasOne("Project_1.Models.Department", "Departments")
+                    b.HasOne("Project_1.Domain.Models.Department", "Departments")
                         .WithMany("Employees")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Project_1.Models.Job", "Jobs")
+                    b.HasOne("Project_1.Domain.Models.Job", "Jobs")
                         .WithMany("Employees")
                         .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -419,33 +419,33 @@ namespace Project_1.Migrations
                     b.Navigation("Jobs");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Job", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Job", b =>
                 {
-                    b.HasOne("Project_1.Models.Department", "Department")
+                    b.HasOne("Project_1.Domain.Models.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId");
 
                     b.Navigation("Department");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Member", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Member", b =>
                 {
-                    b.HasOne("Project_1.Models.Plan", "Plan")
+                    b.HasOne("Project_1.Domain.Models.Plan", "Plan")
                         .WithMany()
                         .HasForeignKey("PlanId");
 
                     b.Navigation("Plan");
                 });
 
-            modelBuilder.Entity("Project_1.Models.PermissionRoles", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.PermissionRoles", b =>
                 {
-                    b.HasOne("Project_1.Models.Permission", "Permissions")
+                    b.HasOne("Project_1.Domain.Models.Permission", "Permissions")
                         .WithMany()
                         .HasForeignKey("PermissionsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Project_1.Models.Role", "Roles")
+                    b.HasOne("Project_1.Domain.Models.Role", "Roles")
                         .WithMany()
                         .HasForeignKey("RolesId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -456,15 +456,15 @@ namespace Project_1.Migrations
                     b.Navigation("Roles");
                 });
 
-            modelBuilder.Entity("Project_1.Models.RoleUser", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.RoleUser", b =>
                 {
-                    b.HasOne("Project_1.Models.Role", "Roles")
+                    b.HasOne("Project_1.Domain.Models.Role", "Roles")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Project_1.Models.User", "Users")
+                    b.HasOne("Project_1.Domain.Models.User", "Users")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -475,21 +475,21 @@ namespace Project_1.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Subscribe", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Subscribe", b =>
                 {
-                    b.HasOne("Project_1.Models.Employee", "Employee")
+                    b.HasOne("Project_1.Domain.Models.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Project_1.Models.Member", "Member")
+                    b.HasOne("Project_1.Domain.Models.Member", "Member")
                         .WithMany("Subscriptions")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Project_1.Models.Plan", "Plan")
+                    b.HasOne("Project_1.Domain.Models.Plan", "Plan")
                         .WithMany("Subscriptions")
                         .HasForeignKey("PlanId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -502,18 +502,18 @@ namespace Project_1.Migrations
                     b.Navigation("Plan");
                 });
 
-            modelBuilder.Entity("Project_1.Models.User", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.User", b =>
                 {
-                    b.HasOne("Project_1.Models.Employee", "Employee")
+                    b.HasOne("Project_1.Domain.Models.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId");
 
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("Project_1.Models.UserFile", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.UserFile", b =>
                 {
-                    b.HasOne("Project_1.Models.User", "Users")
+                    b.HasOne("Project_1.Domain.Models.User", "Users")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -524,35 +524,35 @@ namespace Project_1.Migrations
 
             modelBuilder.Entity("RoleUser", b =>
                 {
-                    b.HasOne("Project_1.Models.Role", null)
+                    b.HasOne("Project_1.Domain.Models.Role", null)
                         .WithMany()
                         .HasForeignKey("RolesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Project_1.Models.User", null)
+                    b.HasOne("Project_1.Domain.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Project_1.Models.Department", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Department", b =>
                 {
                     b.Navigation("Employees");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Job", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Job", b =>
                 {
                     b.Navigation("Employees");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Member", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Member", b =>
                 {
                     b.Navigation("Subscriptions");
                 });
 
-            modelBuilder.Entity("Project_1.Models.Plan", b =>
+            modelBuilder.Entity("Project_1.Domain.Models.Plan", b =>
                 {
                     b.Navigation("Subscriptions");
                 });

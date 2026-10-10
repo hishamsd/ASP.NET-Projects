@@ -12,4 +12,7 @@
 	  <ProjectReference Include="..\Project_1.Domain\Project_1.Domain.csproj" />
 	  <ProjectReference Include="..\Project_1.Infrastructure\Project_1.Infrastructure.csproj" />
 	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+  </ItemGroup>
 </Project>
