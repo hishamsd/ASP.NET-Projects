@@ -1,33 +1,31 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Project_1.Data;
 using Project_1.Models;
+using Project_1.Services.Base;
 
 namespace Project_1.Controllers
 {
-    //[Authorize]
     public class MemberController : Controller
     {
+        private readonly IMemberService _memberService;
 
-        private readonly AppDbContext _db;
-
-        public MemberController(AppDbContext db)
+        public MemberController(IMemberService memberService)
         {
-            _db = db;
+            _memberService = memberService;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
-            var members = _db.Members.ToList();
-            return View(members);
+            return View(_memberService.GetAll());
         }
+
         [HttpGet]
         public IActionResult Create()
         {
             SelectListForPlans();
-            return View();
+
+            return View(new Member());
         }
 
         [HttpPost]
@@ -36,27 +34,28 @@ namespace Project_1.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Members.Add(member);
-                _db.SaveChanges();
+                _memberService.Create(member);
+
                 return RedirectToAction(nameof(Index));
             }
+
+            SelectListForPlans(member.PlanId);
+
             return View(member);
         }
-        private void SelectListForPlans()
-        {
-            IEnumerable<Plan> plans = _db.Plans.ToList();
-            SelectList planSelectList = new SelectList(plans, "Id", "Name");
-            ViewBag.Plans = planSelectList;
-        }
+
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var member = _db.Members.Find(id);
+            var member = _memberService.GetById(id);
+
             if (member == null)
             {
                 return NotFound();
             }
-            ViewBag.Plans = new SelectList(_db.Plans.ToList(), "Id", "Name");
+
+            SelectListForPlans(member.PlanId);
+
             return View(member);
         }
 
@@ -66,26 +65,38 @@ namespace Project_1.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Members.Update(member);
-                _db.SaveChanges();
+                if (!_memberService.Update(member))
+                {
+                    return NotFound();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
+
+            SelectListForPlans(member.PlanId);
+
             return View(member);
         }
+
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
-            var member = _db.Members.FirstOrDefault(m => m.Id == id);
-            if (member == null)
+            if (!_memberService.Delete(id))
             {
                 return NotFound();
             }
 
-            _db.Members.Remove(member);
-            _db.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
+        }
+
+        private void SelectListForPlans(int? planId = null)
+        {
+            ViewBag.Plans = new SelectList(
+                _memberService.GetAllPlans(),
+                "Id",
+                "Name",
+                planId);
         }
     }
 }
-        
-    

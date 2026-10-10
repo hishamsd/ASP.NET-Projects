@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Role>
+﻿@model IEnumerable<Project_1.Models.Role>
 
 @{
     ViewData["Title"] = "Roles";
@@ -8,25 +8,22 @@
 <div class="container mt-4">
 
     <div class="d-flex justify-content-between mb-3">
-
         <h2>Role List</h2>
 
-        <!-- Open Create Modal -->
-        <button class="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#createModal">
+        <button type="button"
+                class="btn btn-primary"
+                data-toggle="modal"
+                data-target="#createModal">
             Create Role
         </button>
-
     </div>
-          <!-- ========================= -->
+
+    <div asp-validation-summary="All"
+         class="text-danger"></div>
+
     <!-- Roles Table -->
-    <!-- ========================= -->
-
     <table class="table table-bordered table-hover">
-
         <thead class="table-primary">
-
             <tr>
                 <th>#</th>
                 <th>ID</th>
@@ -34,11 +31,9 @@
                 <th>Permissions</th>
                 <th>Actions</th>
             </tr>
-
         </thead>
 
         <tbody>
-
             @foreach (var Role in Model)
             {
                 <tr>
@@ -48,270 +43,218 @@
                         counter++;
                     }
 
-
-
                     <td>@Role.Id</td>
-
                     <td>@Role.Name</td>
 
                     <td>
-                            <a asp-controller="Roles"
+                        <a asp-controller="Roles"
                            asp-action="AssignPermissions"
                            asp-route-roleId="@Role.Id"
-                               class="btn btn-info">
+                           class="btn btn-info">
                             View Permissions
                         </a>
-                        </td>
+                    </td>
 
                     <td>
-                        <!-- Open Edit Modal -->
-                        <button class="btn btn-warning"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editModal-@Role.Id">
+                        <button type="button"
+                                class="btn btn-warning"
+                                data-toggle="modal"
+                                data-target="#editModal-@Role.Id">
                             Edit Role
                         </button>
 
-
-                        <!-- Open Edit Modal -->
-                        <button class="btn btn-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal-@Role.Id">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-toggle="modal"
+                                data-target="#deleteModal-@Role.Id">
                             Delete Role
                         </button>
-                        </td>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
-                    </tr>
-                }
+<!-- Create Modal -->
+<div class="modal fade"
+     id="createModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="createModalTitle"
+     aria-hidden="true">
 
-            </tbody>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
 
-        </table>
+            <form asp-controller="Roles"
+                  asp-action="Create"
+                  method="post">
 
-    </div>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createModalTitle">
+                        Create Role
+                    </h5>
 
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
 
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="createRoleName">
+                            Role Name
+                        </label>
 
-    <!-- ================================================= -->
-    <!-- CREATE MODAL -->
-    <!-- ================================================= -->
-
-    <div class="modal fade"
-         id="createModal"
-         tabindex="-1">
-
-        <div class="modal-dialog">
-
-            <div class="modal-content">
-
-                <form asp-action="Create" method="post">
-
-                    <div class="modal-header">
-
-                        <h5 class="modal-title">
-                            Create Role
-                        </h5>
-
-                        <button type="button"
-                                class="btn-close"
-                                data-bs-dismiss="modal">
-                        </button>
-
+                        <input type="text"
+                               id="createRoleName"
+                               name="Name"
+                               class="form-control"
+                               placeholder="Enter role name"
+                               required />
                     </div>
+                </div>
 
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-dismiss="modal">
+                        Cancel
+                    </button>
 
-                    <div class="modal-body">
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Role Name
-                            </label>
-
-                            <input name="Name"
-                                   class="form-control"
-                                   placeholder="Enter role name" />
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="modal-footer">
-
-                        <button type="button"
-                                class="btn btn-secondary"
-                                data-bs-dismiss="modal">
-                            Cancel
-                        </button>
-
-                        <button type="submit"
-                                class="btn btn-primary">
-                            Create
-                        </button>
-
-                    </div>
-
-                </form>
-
-            </div>
-
+                    <button type="submit" class="btn btn-primary">
+                        Create
+                    </button>
+                </div>
+            </form>
         </div>
-
     </div>
+</div>
 
-
-
-                        
-<!-- ================================================= -->
-<!-- EDIT + DELETE MODALS -->
-<!-- ================================================= -->
+<!-- Edit + Delete Modals -->
 @foreach (var Role in Model)
 {
-    <!-- ========================= -->
-    <!-- EDIT MODAL -->
-    <!-- ========================= -->
-
+    <!-- Edit Modal -->
     <div class="modal fade"
-    id="editModal-@Role.Id"
-    tabindex="-1">
+         id="editModal-@Role.Id"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="editModalTitle-@Role.Id"
+         aria-hidden="true">
 
-        <div class="modal-dialog">
-
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
 
-                <form asp-action="Edit" method="post">
+                <form asp-controller="Roles"
+                      asp-action="Edit"
+                      method="post">
 
-                    <!-- Important -->
                     <input type="hidden"
-                    name="Id"
-                    value="@Role.Id" />
-
+                           name="Id"
+                           value="@Role.Id" />
 
                     <div class="modal-header">
-
-                        <h5 class="modal-title">
+                        <h5 class="modal-title"
+                            id="editModalTitle-@Role.Id">
                             Edit Role
                         </h5>
 
                         <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal">
+                                class="close"
+                                data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
                         </button>
-
                     </div>
 
-
                     <div class="modal-body">
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
+                        <div class="form-group">
+                            <label for="editRoleName-@Role.Id">
                                 Role Name
                             </label>
 
                             <input type="text"
-                            name="Name"
-                            value="@Role.Name"
-                            class="form-control" />
-
+                                   id="editRoleName-@Role.Id"
+                                   name="Name"
+                                   value="@Role.Name"
+                                   class="form-control"
+                                   required />
                         </div>
-
                     </div>
 
-
                     <div class="modal-footer">
-
                         <button type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">
+                                class="btn btn-secondary"
+                                data-dismiss="modal">
                             Cancel
                         </button>
 
-                        <button type="submit"
-                        class="btn btn-warning">
+                        <button type="submit" class="btn btn-warning">
                             Save Changes
                         </button>
-
                     </div>
-
                 </form>
-
             </div>
-
         </div>
-
     </div>
 
-
-
-
-    <!-- ========================= -->
-    <!-- DELETE MODAL -->
-    <!-- ========================= -->
-
+    <!-- Delete Confirmation Modal -->
     <div class="modal fade"
          id="deleteModal-@Role.Id"
-         tabindex="-1">
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="deleteModalTitle-@Role.Id"
+         aria-hidden="true">
 
-        <div class="modal-dialog">
-
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
 
-                <form asp-action="DeleteConfirmed" method="post">
+                <form asp-controller="Roles"
+                      asp-action="DeleteConfirmed"
+                      method="post">
 
                     <input type="hidden"
                            name="id"
                            value="@Role.Id" />
 
-
                     <div class="modal-header">
-
-                        <h5 class="modal-title">
-                            Delete Role
+                        <h5 class="modal-title"
+                            id="deleteModalTitle-@Role.Id">
+                            تأكيد الحذف
                         </h5>
 
                         <button type="button"
-                                class="btn-close"
-                                data-bs-dismiss="modal">
+                                class="close"
+                                data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
                         </button>
-
                     </div>
-
 
                     <div class="modal-body">
-
                         <p>
-                            Are you sure you want to delete
-                            <strong>@Role.Name</strong>?
+                            هل أنت متأكد من حذف الرول
+                            <strong>@Role.Name</strong>؟
                         </p>
-
                     </div>
-
 
                     <div class="modal-footer">
-
                         <button type="button"
                                 class="btn btn-secondary"
-                                data-bs-dismiss="modal">
-                            Cancel
+                                data-dismiss="modal">
+                            إلغاء
                         </button>
 
-                        <button type="submit"
-                                class="btn btn-danger">
-                            Delete
+                        <button type="submit" class="btn btn-danger">
+                            تأكيد الحذف
                         </button>
-
                     </div>
-
                 </form>
-
             </div>
-
         </div>
-
     </div>
-
-
-
-
 }

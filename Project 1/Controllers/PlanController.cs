@@ -1,81 +1,97 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Project_1.Data;
 using Project_1.Models;
+using Project_1.Services.Base;
+
 namespace Project_1.Controllers
 {
     public class PlanController : Controller
     {
-        private readonly AppDbContext _db;
-        public PlanController(AppDbContext db)
+        private readonly IPlanService _planService;
+
+        public PlanController(IPlanService planService)
         {
-            _db = db;
+            _planService = planService;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
-            IEnumerable<Plan> names = _db.Plans.ToList();
-            return View(names);
+            return View(_planService.GetAll());
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return View(new Plan());
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Plan plan)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _db.Plans.Add(plan);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
+                return View(plan);
             }
-            return View();
+
+            _planService.Create(plan);
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
-        public IActionResult Edit(int Id)
+        public IActionResult Edit(int id)
         {
-            var plan = _db.Plans.Find(Id);
+            var plan = _planService.GetById(id);
+
             if (plan == null)
             {
                 return NotFound();
             }
+
             return View(plan);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(Plan plan)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _db.Plans.Update(plan);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
+                return View(plan);
             }
-            return View();
+
+            if (!_planService.Update(plan))
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
-        public IActionResult Delete(int Id)
+        public IActionResult Delete(int id)
         {
-            var plan = _db.Plans.Find(Id);
+            var plan = _planService.GetById(id);
+
             if (plan == null)
             {
                 return NotFound();
             }
+
             return View(plan);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Delete(Plan plan)
         {
-            _db.Plans.Remove(plan);
-            _db.SaveChanges();
-            return RedirectToAction("Index");
+            if (!_planService.Delete(plan.Id))
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

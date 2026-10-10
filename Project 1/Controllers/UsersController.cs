@@ -1,306 +1,244 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Project_1.Data;
 using Project_1.Dtos;
 using Project_1.Dtos.UsersDtos;
 using Project_1.Models;
-
+using Project_1.Services.Base;
 
 namespace Project_1.Controllers
 {
     public class UsersController : Controller
     {
-        private readonly AppDbContext _db;
+        private readonly IUserService _userService;
 
-        public UsersController(AppDbContext db)
+        public UsersController(IUserService userService)
         {
-            _db = db;
+            _userService = userService;
         }
 
-
-
-        private string UploadImage(IFormFile image, string name)
-        {
-            string fileName = name + "_" + Guid.NewGuid().ToString()
-                              + Path.GetExtension(image.FileName);
-
-            string folderPath = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "wwwroot",
-                "images",
-                "Users"
-            );
-
-            // Create folder if it doesn't exist
-            Directory.CreateDirectory(folderPath);
-
-            string filePath = Path.Combine(
-                folderPath,
-                fileName
-            );
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                image.CopyTo(stream);
-            }
-
-            return "/images/Users/" + fileName;
-        }
-
-
-
-
-
-
-
-
-
+        [HttpGet]
         public IActionResult Index()
         {
-            IEnumerable<UserDto> users = _db.Users.Select(e => new UserDto
-            {
-                Id = e.Id,
-                UID = e.UID,
-                Name = e.Name,
-                ImageURL = e.ImageURL,
-            }).ToList();
-            return View(users);
+            return View(_userService.GetAll());
         }
 
-
+        [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return View(new CreateUserDto());
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(CreateUserDto userDto)
         {
-
-
-
-
-            if (ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(userDto.Password))
             {
-                var user = new User
-                {
-                    Name = userDto.Name,
-                    Email = userDto.Email,
-                    Password = userDto.Password,
-                    Username = userDto.Username,
-                    HashPassword = BCrypt.Net.BCrypt.HashPassword(userDto.Password)
-                };
-
-                if (userDto.image != null)
-                {
-                    user.ImageURL = UploadImage(userDto.image, userDto.Name);
-                }
-
-
-
-                _db.Users.Add(user);
-                _db.SaveChanges();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError(
+                    nameof(userDto.Password),
+                    "اكتب كلمة المرور.");
             }
-            return View(userDto);
+
+            if (!ModelState.IsValid)
+            {
+                return View(userDto);
+            }
+
+            _userService.Create(userDto);
+
+            return RedirectToAction(nameof(Index));
         }
 
-
-        public IActionResult Edit(string uid)
+        [HttpGet]
+        public IActionResult Edit(int id)
         {
-            var user = _db.Users.FirstOrDefault(e => e.UID == uid);
+            var user = _userService.GetById(id);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            if (user.UID == null)
-                user.UID = Guid.NewGuid().ToString();
-
-            // Mapping
             var userDto = new UpdateUserDto
             {
                 Id = user.Id,
-                Email = user.Email,
-                Password = user.Password,
                 Name = user.Name,
+                Email = user.Email,
+                Phone = user.Phone,
                 Username = user.Username,
-
+                Password = ""
             };
+
             return View(userDto);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(UpdateUserDto userDto)
         {
-            if (ModelState.IsValid)
+            // A blank password keeps the current password.
+            if (string.IsNullOrWhiteSpace(userDto.Password))
             {
-                var user = _db.Users.Find(userDto.Id);
-
-                if (user == null)
-                    return NotFound();
-
-                user.Email = userDto.Email;
-                user.Name = userDto.Name;
-                user.Username = userDto.Username;
-
-
-
-                if (!string.IsNullOrEmpty(userDto.Password))
-                {
-                    user.Password = userDto.Password;
-                    user.HashPassword =
-                        BCrypt.Net.BCrypt.HashPassword(userDto.Password);
-                }
-
-                if (userDto.image != null)
-                {
-                    user.ImageURL = UploadImage(userDto.image, userDto.Name);
-                }
-
-
-
-                // _db.Users.Update(user);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
+                ModelState.Remove(nameof(userDto.Password));
             }
-            return View(userDto);
-        }
 
-        [HttpPost]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            var user = _db.Users.Find(id);
-            if (user == null)
+            if (!ModelState.IsValid)
+            {
+                return View(userDto);
+            }
+
+            var updated = _userService.Update(userDto);
+
+            if (!updated)
             {
                 return NotFound();
             }
-            _db.Users.Remove(user);
-            _db.SaveChanges();
-            return RedirectToAction("Index");
+
+            return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var deleted = _userService.Delete(id);
 
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
 
         [HttpGet]
         public IActionResult ManageRoles(int id)
         {
-            var user = _db.Users.Find(id);
+            var model = _userService.GetUserRoles(id);
 
-            if (user == null)
+            if (model == null)
             {
                 return NotFound();
             }
-
-            // جميع الصلاحيات
-            var roles = _db.Roles.ToList();
-
-            // الصلاحيات الموجودة بالفعل للمستخدم
-            var userRoleIds = _db.RoleUsers
-                .Where(x => x.UserId == id)
-                .Select(x => x.RoleId)
-                .ToList();
-
-            var model = new UserRolesVM
-            {
-                UserId = user.Id,
-                UserName = user.Name,
-
-                Roles = roles.Select(role => new RoleCheckVM
-                {
-                    RoleId = role.Id,
-                    RoleName = role.Name,
-
-                    IsSelected = userRoleIds.Contains(role.Id)
-
-                }).ToList()
-            };
 
             return View(model);
         }
 
-
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult ManageRoles(UserRolesVM model)
         {
-            var user = _db.Users.Find(model.UserId);
+            var selectedIds = model.Roles?
+                .Where(role => role.IsSelected)
+                .Select(role => role.RoleId)
+                .ToList() ?? new List<int>();
 
-            if (user == null)
+            try
             {
-                return NotFound();
-            }
+                var saved = _userService.SaveUserRoles(
+                    model.UserId,
+                    selectedIds);
 
-            // Get old roles
-            var oldRoles = _db.RoleUsers
-                .Where(x => x.UserId == model.UserId)
-                .ToList();
-
-            // Remove old roles
-            _db.RoleUsers.RemoveRange(oldRoles);
-
-            // Add selected roles
-            foreach (var role in model.Roles)
-            {
-                if (role.IsSelected)
+                if (!saved)
                 {
-                    RoleUser roleUser = new RoleUser
-                    {
-                        UserId = model.UserId,
-                        RoleId = role.RoleId
-                    };
-
-                    _db.RoleUsers.Add(roleUser);
+                    return NotFound();
                 }
+
+                return RedirectToAction(nameof(Index));
             }
+            catch (ArgumentException ex)
+            {
+                var displayModel =
+                    _userService.GetUserRoles(model.UserId);
 
-            _db.SaveChanges();
+                if (displayModel == null)
+                {
+                    return NotFound();
+                }
 
-            return RedirectToAction("Index");
+                ModelState.Clear();
+                ModelState.AddModelError("", ex.Message);
+
+                foreach (var role in displayModel.Roles)
+                {
+                    role.IsSelected =
+                        selectedIds.Contains(role.RoleId);
+                }
+
+                return View(displayModel);
+            }
         }
 
+        [HttpGet]
         public IActionResult ManageFiles(int UserId)
         {
-            var user = _db.Users.Find(UserId);
+            var user = _userService.GetById(UserId);
+
             if (user == null)
             {
                 return NotFound();
             }
 
-            var files = _db.UserFiles.Where(e => e.UserId == UserId).ToList();
+            LoadFiles(UserId, user.Name);
 
-            ViewBag.Files = files;
-
-            var userFile = new UserFile();
-
-            userFile.UserId = UserId;
-
-            ViewBag.userName = user.Name;
-
-
-            return View(userFile);
+            return View(new UserFile
+            {
+                UserId = UserId
+            });
         }
 
-
         [HttpPost]
-        public IActionResult ManageFiles(UserFile userFile, IFormFile file)
+        [ValidateAntiForgeryToken]
+        public IActionResult ManageFiles(
+            UserFile userFile,
+            IFormFile? file)
         {
-            if (file == null)
+            var user = _userService.GetById(userFile.UserId);
+
+            if (user == null)
             {
-                return View(userFile);
+                return NotFound();
             }
 
-            userFile.FileURL = UploadImage(file, userFile.Name);
+            if (file == null || file.Length == 0)
+            {
+                ModelState.AddModelError(
+                    "file",
+                    "اختر الملف.");
+            }
 
+            if (string.IsNullOrWhiteSpace(userFile.Name))
+            {
+                ModelState.AddModelError(
+                    nameof(userFile.Name),
+                    "اكتب اسم الملف.");
+            }
 
             if (!ModelState.IsValid)
             {
+                LoadFiles(userFile.UserId, user.Name);
+
                 return View(userFile);
             }
 
-            _db.UserFiles.Add(userFile);
-            _db.SaveChanges();
+            var saved = _userService.AddUserFile(
+                userFile.UserId,
+                userFile.Name,
+                file!);
 
-            return RedirectToAction("ManageFiles", new { UserId = userFile.UserId });
+            if (!saved)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(
+                nameof(ManageFiles),
+                new { UserId = userFile.UserId });
+        }
+
+        private void LoadFiles(int userId, string userName)
+        {
+            ViewBag.Files = _userService.GetUserFiles(userId);
+            ViewBag.userName = userName;
         }
     }
 }

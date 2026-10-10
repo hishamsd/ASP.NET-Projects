@@ -1,20 +1,27 @@
 ﻿@{
     ViewBag.Title = ViewBag.Title ?? "نظام إدارة النادي الرياضي";
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <title>@ViewBag.Title - لوحة التحكم</title>
 
     <!-- FontAwesome & Custom Fonts -->
-    <link href="~/template/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="~/template/vendor/fontawesome-free/css/all.min.css"
+          rel="stylesheet"
+          type="text/css">
+
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+          rel="stylesheet">
 
     <!-- Custom styles for SB Admin 2 -->
     <link href="~/template/css/sb-admin-2.min.css" rel="stylesheet">
+
     @RenderSection("Styles", required: false)
 </head>
 
@@ -24,13 +31,18 @@
     <div id="wrapper">
 
         <!-- Sidebar (القائمة الجانبية للنادي الرياضي) -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
+            id="accordionSidebar">
 
             <!-- Brand Logo & Name -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" asp-controller="Home" asp-action="Index">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center"
+               asp-controller="Home"
+               asp-action="Index">
+
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-dumbbell"></i>
                 </div>
+
                 <div class="sidebar-brand-text mx-3">إدارة النادي</div>
             </a>
 
@@ -38,7 +50,10 @@
 
             <!-- Dashboard -->
             <li class="nav-item active">
-                <a class="nav-link" asp-controller="Home" asp-action="Index">
+                <a class="nav-link"
+                   asp-controller="Home"
+                   asp-action="Index">
+
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>الرئيسية</span>
                 </a>
@@ -50,7 +65,10 @@
 
             <!-- Members (الأعضاء) -->
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Member" asp-action="Index">
+                <a class="nav-link"
+                   asp-controller="Member"
+                   asp-action="Index">
+
                     <i class="fas fa-fw fa-users"></i>
                     <span>الأعضاء (Members)</span>
                 </a>
@@ -58,7 +76,10 @@
 
             <!-- Subscriptions (الاشتراكات) -->
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Subscriptions" asp-action="Index">
+                <a class="nav-link"
+                   asp-controller="Subscriptions"
+                   asp-action="Index">
+
                     <i class="fas fa-fw fa-id-card"></i>
                     <span>الاشتراكات (Subscriptions)</span>
                 </a>
@@ -66,26 +87,89 @@
 
             <!-- Membership Plans (باقات الاشتراك) -->
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Plan" asp-action="Index">
+                <a class="nav-link"
+                   asp-controller="Plan"
+                   asp-action="Index">
+
                     <i class="fas fa-fw fa-tags"></i>
                     <span>باقات الاشتراك (Plans)</span>
                 </a>
             </li>
 
-            <!-- Employees / Trainers (الموظفين والمدربين) -->
+            <!-- إدارة المستخدمين -->
             <li class="nav-item">
-                <a class="nav-link" asp-controller="Users" asp-action="Index">
-                    <i class="fas fa-fw fa-user-tie"></i>
-                    <span>الموظفين والمدربين</span>
+                <a class="nav-link"
+                   asp-controller="Users"
+                   asp-action="Index">
+
+                    <i class="fas fa-fw fa-user-cog"></i>
+                    <span>المستخدمون</span>
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link"
+                   asp-controller="Roles"
+                   asp-action="Index">
+
+                    <i class="fas fa-fw fa-user-shield"></i>
+                    <span>الأدوار (Roles)</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link"
+                   asp-controller="Permissions"
+                   asp-action="Index">
+
+                    <i class="fas fa-fw fa-key"></i>
+                    <span>الصلاحيات (Permissions)</span>
+                </a>
+            </li>
+
+            <hr class="sidebar-divider">
+
+            <div class="sidebar-heading">
+                الموارد البشرية (HR)
+            </div>
+
+            <!-- الموظفون -->
+            <li class="nav-item">
+                <a class="nav-link"
+                   asp-controller="Employee"
+                   asp-action="Index">
+
+                    <i class="fas fa-fw fa-user-tie"></i>
+                    <span>الموظفون (Employees)</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link"
+                   asp-controller="Department"
+                   asp-action="Index">
+
+                    <i class="fas fa-fw fa-building"></i>
+                    <span>الأقسام (Departments)</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link"
+                   asp-controller="Job"
+                   asp-action="Index">
+
+                    <i class="fas fa-fw fa-briefcase"></i>
+                    <span>الوظائف (Jobs)</span>
+                </a>
+            </li>
 
             <hr class="sidebar-divider d-none d-md-block">
 
             <!-- Sidebar Toggler -->
             <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+                <button class="rounded-circle border-0"
+                        id="sidebarToggle"></button>
             </div>
 
         </ul>
@@ -100,7 +184,9 @@
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
                     <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <button id="sidebarToggleTop"
+                            class="btn btn-link d-md-none rounded-circle mr-3">
+
                         <i class="fa fa-bars"></i>
                     </button>
 
@@ -109,17 +195,53 @@
 
                         <!-- User Information -->
                         <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">@(User?.Identity?.Name ?? "زائر / Admin")</span>
-                                <i class="fas fa-user-circle fa-2x text-gray-400"></i>
+
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="userDropdown"
+                               role="button"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                                    @(User.Identity?.Name ?? "زائر")
+                                </span>
+
+                                @{
+                                    var userImage = User.FindFirst("ImageURL")?.Value;
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(userImage))
+                                {
+                                    <img src="@Url.Content(userImage)"
+                                         alt="صورة المستخدم"
+                                         width="40"
+                                         height="40"
+                                         style="object-fit:cover;border-radius:50%;" />
+                                }
+                                else
+                                {
+                                    <i class="fas fa-user-circle fa-2x text-gray-400"></i>
+                                }
+
                             </a>
+
                             <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="userDropdown">
+
+                                <a class="dropdown-item"
+                                   href="#"
+                                   data-toggle="modal"
+                                   data-target="#logoutModal">
+
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     تسجيل الخروج
                                 </a>
+
                             </div>
+
                         </li>
 
                     </ul>
@@ -138,7 +260,9 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>حقوق النشر &copy; نظام إدارة النادي الرياضي @DateTime.Now.Year</span>
+                        <span>
+                            حقوق النشر &copy; نظام إدارة النادي الرياضي @DateTime.Now.Year
+                        </span>
                     </div>
                 </div>
             </footer>
@@ -149,28 +273,62 @@
 
     </div>
     <!-- End of Page Wrapper -->
-    <!-- Scroll to Top Button-->
+    <!-- Scroll to Top Button -->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- Logout Modal -->
+    <div class="modal fade"
+         id="logoutModal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+
         <div class="modal-dialog" role="document">
             <div class="modal-content">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">هل تريد تسجيل الخروج؟</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        هل تريد تسجيل الخروج؟
+                    </h5>
+
+                    <button class="close"
+                            type="button"
+                            data-dismiss="modal"
+                            aria-label="Close">
+
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <div class="modal-body">اختر "تسجيل الخروج" أدناه إذا كنت مستعداً لإنهاء جلستك الحالية.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">إلغاء</button>
-                    <a class="btn btn-primary" asp-controller="Account" asp-action="Logout">تسجيل الخروج</a>
+
+                <div class="modal-body">
+                    اختر "تسجيل الخروج" أدناه إذا كنت مستعداً لإنهاء جلستك الحالية.
                 </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary"
+                            type="button"
+                            data-dismiss="modal">
+                        إلغاء
+                    </button>
+
+                    <form asp-controller="Accounts"
+                          asp-action="Logout"
+                          method="post"
+                          class="d-inline">
+
+                        <button type="submit" class="btn btn-primary">
+                            تسجيل الخروج
+                        </button>
+
+                    </form>
+                </div>
+
             </div>
         </div>
+
     </div>
 
     <!-- Scripts -->
@@ -180,5 +338,6 @@
     <script src="~/template/js/sb-admin-2.min.js"></script>
 
     @RenderSection("Scripts", required: false)
+
 </body>
 </html>

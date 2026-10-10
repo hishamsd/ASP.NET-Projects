@@ -1,125 +1,116 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Project_1.Data;
-using Project_1.Models;
+using Project_1.Services.Base;
 
 namespace Project_1.Controllers
 {
     public class RolesController : Controller
     {
-        private readonly AppDbContext _db;
+        private readonly IRoleService _roleService;
 
-        public RolesController(AppDbContext db)
+        public RolesController(IRoleService roleService)
         {
-            _db = db;
+            _roleService = roleService;
         }
 
-
+        [HttpGet]
         public IActionResult Index()
         {
-            IEnumerable<Role> roles = _db.Roles.ToList();
-            return View(roles);
+            return View(_roleService.GetAll());
         }
 
-
-
         [HttpPost]
-        public IActionResult Create(Role role)
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(string name)
         {
-            if (ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(name))
             {
-                _db.Roles.Add(role);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
+                ModelState.AddModelError("Name", "اكتب اسم الرول.");
             }
-            return View(role);
+
+            if (!ModelState.IsValid)
+            {
+                return View("Index", _roleService.GetAll());
+            }
+
+            _roleService.Create(name);
+
+            return RedirectToAction(nameof(Index));
         }
 
-
-
         [HttpPost]
-        public IActionResult Edit(Role role)
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, string name)
         {
-            if (ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(name))
             {
-                _db.Roles.Update(role);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
+                ModelState.AddModelError("Name", "اكتب اسم الرول.");
             }
-            return View(role);
+
+            if (!ModelState.IsValid)
+            {
+                return View("Index", _roleService.GetAll());
+            }
+
+            var updated = _roleService.Update(id, name);
+
+            if (!updated)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
-
-
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var role = _db.Roles.Find(id);
-            if (role == null)
+            var deleted = _roleService.Delete(id);
+
+            if (!deleted)
             {
                 return NotFound();
             }
-            _db.Roles.Remove(role);
-            _db.SaveChanges();
-            return RedirectToAction("Index");
+
+            return RedirectToAction(nameof(Index));
         }
 
-
+        [HttpGet]
         public IActionResult AssignPermissions(int roleId)
         {
-            var role = _db.Roles
-                .Include(r => r.Permissions)
-                .FirstOrDefault(r => r.Id == roleId);
+            var role = _roleService.GetByIdWithPermissions(roleId);
 
             if (role == null)
             {
                 return NotFound();
             }
 
-            var permissions = _db.Permissions.ToList();
-
-            ViewBag.AllPermissions = permissions;
+            ViewBag.AllPermissions =
+                _roleService.GetAllPermissions().ToList();
 
             ViewBag.AssignedPermissions = role.Permissions
-                .Select(p => p.Id)
+                .Select(permission => permission.Id)
                 .ToList();
 
             return View(role);
         }
 
-
         [HttpPost]
-        public IActionResult AssignPermissions(int roleId, List<int> permissionIds)
+        [ValidateAntiForgeryToken]
+        public IActionResult AssignPermissions(
+            int roleId,
+            List<int>? permissionIds)
         {
-            var role = _db.Roles
-                .Include(r => r.Permissions)
-                .FirstOrDefault(r => r.Id == roleId);
+            var saved = _roleService.AssignPermissions(
+                roleId,
+                permissionIds ?? new List<int>());
 
-            if (role == null)
+            if (!saved)
             {
                 return NotFound();
             }
 
-
-          
-            role.Permissions.Clear();
-
-
-            var permissions = _db.Permissions
-                .Where(p => permissionIds.Contains(p.Id))
-                .ToList();
-
-
-            
-            foreach (var permission in permissions)
-            {
-                role.Permissions.Add(permission);
-            }
-
-
-            _db.SaveChanges();
-
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
     }
 }

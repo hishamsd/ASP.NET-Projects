@@ -1,0 +1,40 @@
+﻿@using Project_1.Dtos.HRDtos
+@model CreateJobDto
+
+@{
+    ViewData["Title"] = "إضافة وظيفة";
+}
+
+<h1>إضافة وظيفة</h1>
+
+<form asp-action="Create" method="post">
+
+    <div asp-validation-summary="All"
+         class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name">اسم الوظيفة</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name"
+              class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DepartmentId">القسم</label>
+        <select asp-for="DepartmentId"
+                asp-items="ViewBag.Departments"
+                class="form-control">
+            <option value="">اختر القسم</option>
+        </select>
+        <span asp-validation-for="DepartmentId"
+              class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        حفظ
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        رجوع
+    </a>
+</form>

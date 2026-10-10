@@ -1,65 +1,79 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Project_1.Data;
-using Project_1.Models;
+using Project_1.Dtos;
+using Project_1.Services.Base;
+
 namespace Project_1.Controllers
 {
     public class PermissionsController : Controller
     {
-        private readonly AppDbContext _db;
+        private readonly IPermissionService _permissionService;
 
-        public PermissionsController(AppDbContext db)
+        public PermissionsController(
+            IPermissionService permissionService)
         {
-            _db = db;
+            _permissionService = permissionService;
         }
-
 
         public IActionResult Index()
         {
-            IEnumerable<Permission> permissions = _db.Permissions.ToList();
-            return View(permissions);
+            return View(_permissionService.GetAll());
         }
 
-
-
         [HttpPost]
-        public IActionResult Create(Permission permission)
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(CreatePermissionDto permissionDto)
         {
-            if (ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(permissionDto.Name))
             {
-                _db.Permissions.Add(permission);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
+                ModelState.AddModelError("Name", "اكتب اسم الصلاحية.");
             }
-            return View(permission);
-        }
 
-
-
-        [HttpPost]
-        public IActionResult Edit(Permission permission)
-        {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _db.Permissions.Update(permission);
-                _db.SaveChanges();
-                return RedirectToAction("Index");
+                return View("Index", _permissionService.GetAll());
             }
-            return View(permission);
+
+            _permissionService.Create(permissionDto);
+
+            return RedirectToAction(nameof(Index));
         }
 
-
-
         [HttpPost]
-        public IActionResult DeleteConfirmed(int id)
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(UpdatePermissionDto permissionDto)
         {
-            var permission = _db.Permissions.Find(id);
-            if (permission == null)
+            if (string.IsNullOrWhiteSpace(permissionDto.Name))
+            {
+                ModelState.AddModelError("Name", "اكتب اسم الصلاحية.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("Index", _permissionService.GetAll());
+            }
+
+            var updated = _permissionService.Update(permissionDto);
+
+            if (!updated)
             {
                 return NotFound();
             }
-            _db.Permissions.Remove(permission);
-            _db.SaveChanges();
-            return RedirectToAction("Index");
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            var deleted = _permissionService.Delete(id);
+
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

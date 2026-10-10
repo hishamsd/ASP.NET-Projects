@@ -1,5 +1,4 @@
-﻿﻿@using Project_1.Dtos
-
+﻿@using Project_1.Dtos
 @model UserRolesVM
 
 @{
@@ -20,38 +19,47 @@
                 User: @Model.UserName
             </h5>
 
-            <form asp-action="ManageRoles" method="post">
+            <form asp-controller="Users"
+                  asp-action="ManageRoles"
+                  method="post">
 
-                <input type="hidden"
-                       asp-for="UserId" />
+                <div asp-validation-summary="All"
+                     class="text-danger"></div>
 
-                @for (int i = 0; i < Model.Roles.Count; i++)
+                <input type="hidden" asp-for="UserId" />
+
+                @if (Model.Roles.Count == 0)
                 {
-                    <div class="form-check mb-3">
-
-                        <input type="hidden"
-                               asp-for="Roles[i].RoleId" />
-
-                        <input class="form-check-input"
-                               asp-for="Roles[i].IsSelected" />
-
-                        <label class="form-check-label"
-                               asp-for="Roles[i].IsSelected">
-
-                            @Model.Roles[i].RoleName
-
-                        </label>
-
+                    <div class="alert alert-info">
+                        ما فيه رولز حاليًا. أضفها من صفحة Roles أولًا.
                     </div>
                 }
+                else
+                {
+                    @for (int i = 0; i < Model.Roles.Count; i++)
+                    {
+                        <div class="form-check mb-3">
 
-                <button type="submit"
-                        class="btn btn-success">
-                    Save Roles
-                </button>
+                            <input type="hidden"
+                                   asp-for="Roles[i].RoleId" />
 
-                <a asp-action="Index"
-                   class="btn btn-secondary">
+                            <input class="form-check-input"
+                                   asp-for="Roles[i].IsSelected" />
+
+                            <label class="form-check-label"
+                                   asp-for="Roles[i].IsSelected">
+                                @Model.Roles[i].RoleName
+                            </label>
+
+                        </div>
+                    }
+
+                    <button type="submit" class="btn btn-success">
+                        Save Roles
+                    </button>
+                }
+
+                <a asp-action="Index" class="btn btn-secondary">
                     Back
                 </a>
 

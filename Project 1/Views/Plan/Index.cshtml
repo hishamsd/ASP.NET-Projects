@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Plan>
+﻿@using Project_1.Models
+@model IEnumerable<Plan>
 
 @{
     ViewData["Title"] = "Plan Page";
@@ -9,29 +10,24 @@
 </div>
 
 <div class="container">
+
     <div class="row text-end">
         <div class="col-md-12">
-            <a asp-action="Create" class="btn btn-primary">Create New Plan</a>
+            <a asp-action="Create" class="btn btn-primary">
+                Create New Plan
+            </a>
         </div>
     </div>
+
     <table class="table table-striped">
+
         <thead>
             <tr>
-                <th>
-                    ID
-                </th>
-                <th>
-                    Name
-                </th>
-                <th>
-                    Price
-                </th>
-                <th>
-                    Description
-                </th>
-                <th>
-                    Actions
-                </th>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Description</th>
+                <th>Actions</th>
             </tr>
         </thead>
 
@@ -39,48 +35,85 @@
             @foreach (var name in Model)
             {
                 <tr>
-                    <td>
-                        @name.Id
-                    </td>
-                    <td>
-                        @name.Name
-                    </td>
-                    <td>
-                        @name.Price
-                    </td>
-                    <td>
-                        @name.Description
-                    </td>
-                   
-                   <td>
-    <a asp-action="Edit" asp-route-id="@name.Id" class="btn btn-warning">Edit</a>
+                    <td>@name.Id</td>
+                    <td>@name.Name</td>
+                    <td>@name.Price</td>
+                    <td>@name.Description</td>
 
-    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@name.Id">
-        Delete
-    </button>
+                    <td>
+                        <a asp-action="Edit"
+                           asp-route-id="@name.Id"
+                           class="btn btn-warning">
+                            Edit
+                        </a>
 
-    <div class="modal fade" id="deleteModal-@name.Id" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete Confirmation</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete <strong>@name.Name</strong>?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <form asp-action="Delete" asp-route-id="@name.Id" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-danger">Confirm Delete</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</td>
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-toggle="modal"
+                                data-target="#deleteModal-@name.Id">
+                            Delete
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
+
     </table>
+
 </div>
+
+@foreach (var name in Model)
+{
+    <div class="modal fade"
+         id="deleteModal-@name.Id"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="deleteTitle-@name.Id"
+         aria-hidden="true">
+
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTitle-@name.Id">
+                        Delete Confirmation
+                    </h5>
+
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    Are you sure you want to delete
+                    <strong>@name.Name</strong>?
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <form asp-controller="Plan"
+                          asp-action="Delete"
+                          asp-route-id="@name.Id"
+                          method="post"
+                          class="d-inline">
+
+                        <button type="submit" class="btn btn-danger">
+                            Confirm Delete
+                        </button>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+}

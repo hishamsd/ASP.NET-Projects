@@ -1,0 +1,49 @@
+﻿@using Project_1.Dtos.HRDtos
+@model JobDto
+
+@{
+    ViewData["Title"] = "تعديل الوظيفة";
+}
+
+<h1>تعديل الوظيفة</h1>
+
+<form asp-controller="Job"
+      asp-action="Edit"
+      method="post">
+
+    <div asp-validation-summary="All"
+         class="text-danger"></div>
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Name">اسم الوظيفة</label>
+
+        <input asp-for="Name" class="form-control" />
+
+        <span asp-validation-for="Name"
+              class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DepartmentId">القسم</label>
+
+        <select asp-for="DepartmentId"
+                asp-items="ViewBag.Departments"
+                class="form-control">
+            <option value="">-- اختر القسم --</option>
+        </select>
+
+        <span asp-validation-for="DepartmentId"
+              class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-warning">
+        حفظ التعديل
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        رجوع
+    </a>
+
+</form>

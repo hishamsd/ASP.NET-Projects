@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Permission>
+﻿@model IEnumerable<Project_1.Models.Permission>
 
 @{
     ViewData["Title"] = "Permissions";
@@ -8,37 +8,31 @@
 <div class="container mt-4">
 
     <div class="d-flex justify-content-between mb-3">
-
         <h2>Permission List</h2>
 
-        <!-- Open Create Modal -->
-        <button class="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#createModal">
+        <button type="button"
+                class="btn btn-primary"
+                data-toggle="modal"
+                data-target="#createModal">
             Create Permission
         </button>
-
     </div>
-    <!-- ========================= -->
+
+    <div asp-validation-summary="All"
+         class="text-danger"></div>
+
     <!-- Permissions Table -->
-    <!-- ========================= -->
-
     <table class="table table-bordered table-hover">
-
         <thead class="table-primary">
-
             <tr>
                 <th>#</th>
                 <th>ID</th>
                 <th>Name</th>
-             
                 <th>Actions</th>
             </tr>
-
         </thead>
 
         <tbody>
-
             @foreach (var Permission in Model)
             {
                 <tr>
@@ -48,92 +42,77 @@
                         counter++;
                     }
 
-
-
                     <td>@Permission.Id</td>
-                    
                     <td>@Permission.Name</td>
 
-                   
-
                     <td>
-                        <!-- Open Edit Modal -->
-                        <button class="btn btn-warning"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editModal-@Permission.Id">
+                        <button type="button"
+                                class="btn btn-warning"
+                                data-toggle="modal"
+                                data-target="#editModal-@Permission.Id">
                             Edit Permission
                         </button>
 
-
-                        <!-- Open Edit Modal -->
-                        <button class="btn btn-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal-@Permission.Id">
+                        <button type="button"
+                                class="btn btn-danger"
+                                data-toggle="modal"
+                                data-target="#deleteModal-@Permission.Id">
                             Delete Permission
                         </button>
                     </td>
-
                 </tr>
             }
-
         </tbody>
-
     </table>
-
 </div>
 
-
-
-<!-- ================================================= -->
-<!-- CREATE MODAL -->
-<!-- ================================================= -->
-
+<!-- Create Modal -->
 <div class="modal fade"
      id="createModal"
-     tabindex="-1">
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="createModalTitle"
+     aria-hidden="true">
 
-    <div class="modal-dialog">
-
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
 
-            <form asp-action="Create" method="post">
+            <form asp-controller="Permissions"
+                  asp-action="Create"
+                  method="post">
 
                 <div class="modal-header">
-
-                    <h5 class="modal-title">
+                    <h5 class="modal-title" id="createModalTitle">
                         Create Permission
                     </h5>
 
                     <button type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal">
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
-
                 </div>
 
-
                 <div class="modal-body">
-
-                    <div class="mb-3">
-
-                        <label class="form-label">
+                    <div class="form-group">
+                        <label for="createPermissionName">
                             Permission Name
                         </label>
 
-                        <input name="Name"
+                        <input type="text"
+                               id="createPermissionName"
+                               name="Name"
                                class="form-control"
-                               placeholder="Enter Permission name" />
-
+                               placeholder="Enter Permission name"
+                               required />
                     </div>
-
                 </div>
 
-
                 <div class="modal-footer">
-
                     <button type="button"
                             class="btn btn-secondary"
-                            data-bs-dismiss="modal">
+                            data-dismiss="modal">
                         Cancel
                     </button>
 
@@ -141,82 +120,67 @@
                             class="btn btn-primary">
                         Create
                     </button>
-
                 </div>
-
             </form>
-
         </div>
-
     </div>
-
 </div>
 
-
-
-
-<!-- ================================================= -->
-<!-- EDIT + DELETE MODALS -->
-<!-- ================================================= -->
+<!-- Edit + Delete Modals -->
 @foreach (var Permission in Model)
 {
-    <!-- ========================= -->
-    <!-- EDIT MODAL -->
-    <!-- ========================= -->
-
+    <!-- Edit Modal -->
     <div class="modal fade"
          id="editModal-@Permission.Id"
-         tabindex="-1">
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="editModalTitle-@Permission.Id"
+         aria-hidden="true">
 
-        <div class="modal-dialog">
-
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
 
-                <form asp-action="Edit" method="post">
+                <form asp-controller="Permissions"
+                      asp-action="Edit"
+                      method="post">
 
-                    <!-- Important -->
                     <input type="hidden"
                            name="Id"
                            value="@Permission.Id" />
 
-
                     <div class="modal-header">
-
-                        <h5 class="modal-title">
+                        <h5 class="modal-title"
+                            id="editModalTitle-@Permission.Id">
                             Edit Permission
                         </h5>
 
                         <button type="button"
-                                class="btn-close"
-                                data-bs-dismiss="modal">
+                                class="close"
+                                data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
                         </button>
-
                     </div>
 
-
                     <div class="modal-body">
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
+                        <div class="form-group">
+                            <label for="editPermissionName-@Permission.Id">
                                 Permission Name
                             </label>
 
                             <input type="text"
+                                   id="editPermissionName-@Permission.Id"
                                    name="Name"
                                    value="@Permission.Name"
-                                   class="form-control" />
-
+                                   class="form-control"
+                                   required />
                         </div>
-
                     </div>
 
-
                     <div class="modal-footer">
-
                         <button type="button"
                                 class="btn btn-secondary"
-                                data-bs-dismiss="modal">
+                                data-dismiss="modal">
                             Cancel
                         </button>
 
@@ -224,68 +188,56 @@
                                 class="btn btn-warning">
                             Save Changes
                         </button>
-
                     </div>
-
                 </form>
-
             </div>
-
         </div>
-
     </div>
 
-
-
-
-    <!-- ========================= -->
-    <!-- DELETE MODAL -->
-    <!-- ========================= -->
-
+    <!-- Delete Modal -->
     <div class="modal fade"
          id="deleteModal-@Permission.Id"
-         tabindex="-1">
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="deleteModalTitle-@Permission.Id"
+         aria-hidden="true">
 
-        <div class="modal-dialog">
-
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
 
-                <form asp-action="DeleteConfirmed" method="post">
+                <form asp-controller="Permissions"
+                      asp-action="DeleteConfirmed"
+                      method="post">
 
                     <input type="hidden"
                            name="id"
                            value="@Permission.Id" />
 
-
                     <div class="modal-header">
-
-                        <h5 class="modal-title">
+                        <h5 class="modal-title"
+                            id="deleteModalTitle-@Permission.Id">
                             Delete Permission
                         </h5>
 
                         <button type="button"
-                                class="btn-close"
-                                data-bs-dismiss="modal">
+                                class="close"
+                                data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
                         </button>
-
                     </div>
 
-
                     <div class="modal-body">
-
                         <p>
                             Are you sure you want to delete
                             <strong>@Permission.Name</strong>?
                         </p>
-
                     </div>
 
-
                     <div class="modal-footer">
-
                         <button type="button"
                                 class="btn btn-secondary"
-                                data-bs-dismiss="modal">
+                                data-dismiss="modal">
                             Cancel
                         </button>
 
@@ -293,18 +245,9 @@
                                 class="btn btn-danger">
                             Delete
                         </button>
-
                     </div>
-
                 </form>
-
             </div>
-
         </div>
-
     </div>
-
-
-
-
 }

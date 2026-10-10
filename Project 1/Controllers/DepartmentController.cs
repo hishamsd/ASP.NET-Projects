@@ -1,33 +1,134 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Project_1.Dtos.HRDtos;
-using Project_1.Repositories;
+using Project_1.Services.Base;
 
 namespace Project_1.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class DepartmentController : ControllerBase
+    public class DepartmentController : Controller
     {
-        private readonly IDepartmentRepository _repo;
+        private readonly IDepartmentService _departmentService;
 
-        public DepartmentController(IDepartmentRepository repo)
+        public DepartmentController(
+            IDepartmentService departmentService)
         {
-            _repo = repo;
+            _departmentService = departmentService;
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult Index()
         {
-            var list = _repo.GetAll();
-            return Ok(list);
+            return View(_departmentService.GetAll());
         }
 
-        [HttpGet("{id}")]
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View(new CreateDepartmentDto());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(CreateDepartmentDto dto)
+        {
+            ValidateName(dto);
+
+            if (!ModelState.IsValid)
+            {
+                return View(dto);
+            }
+
+            _departmentService.Create(dto);
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var department = _departmentService.GetById(id);
+
+            if (department == null)
+            {
+                return NotFound();
+            }
+
+            return View(department);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, CreateDepartmentDto dto)
+        {
+            var department = _departmentService.GetById(id);
+
+            if (department == null)
+            {
+                return NotFound();
+            }
+
+            ValidateName(dto);
+
+            if (!ModelState.IsValid)
+            {
+                department.Name = dto.Name;
+
+                return View(department);
+            }
+
+            if (!_departmentService.Update(id, dto))
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            try
+            {
+                if (!_departmentService.Delete(id))
+                {
+                    return NotFound();
+                }
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet("/api/Department")]
+        public IActionResult GetAll()
+        {
+            return Ok(_departmentService.GetAll());
+        }
+
+        [HttpGet("/api/Department/{id:int}")]
         public IActionResult GetById(int id)
         {
-            var dept = _repo.GetById(id);
-            if (dept == null) return NotFound("Department not found");
-            return Ok(dept);
+            var department = _departmentService.GetById(id);
+
+            if (department == null)
+            {
+                return NotFound("Department not found");
+            }
+
+            return Ok(department);
+        }
+
+        private void ValidateName(CreateDepartmentDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                ModelState.AddModelError(
+                    nameof(dto.Name),
+                    "اكتب اسم القسم.");
+            }
         }
     }
 }

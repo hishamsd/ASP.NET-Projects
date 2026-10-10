@@ -1,77 +1,139 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Project_1.Data;
 using Project_1.Models;
+using Project_1.Services.Base;
 
 namespace Project_1.Controllers
 {
     public class SubscriptionsController : Controller
     {
-        private readonly AppDbContext _db;
+        private readonly ISubscribeService _subscribeService;
 
-        public SubscriptionsController(AppDbContext db)
+        public SubscriptionsController(
+            ISubscribeService subscribeService)
         {
-            _db = db;
+            _subscribeService = subscribeService;
         }
 
-        // 1. عرض جميع الاشتراكات مع جلب بيانات العضو والخطة والموظف
+        [HttpGet]
         public IActionResult Index()
         {
-            var subscriptions = _db.Subscriptions
-                .Include(s => s.Member)
-                .Include(s => s.Plan)
-                .Include(s => s.Employee)
-                .ToList();
-
-            return View(subscriptions);
+            return View(_subscribeService.GetAll());
         }
 
-        // 2. صفحة إضافة اشتراك جديد (GET)
         [HttpGet]
         public IActionResult Create()
         {
             PopulateDropdowns();
-            return View();
+
+            return View(new Subscribe());
         }
 
-        // 3. حفظ الاشتراك الجديد (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Subscribe subscription)
         {
+            RemoveNavigationValidation();
+
             if (ModelState.IsValid)
             {
-                _db.Subscriptions.Add(subscription);
-                _db.SaveChanges();
+                _subscribeService.Create(subscription);
+
                 return RedirectToAction(nameof(Index));
             }
 
-            PopulateDropdowns();
+            PopulateDropdowns(
+                subscription.MemberId,
+                subscription.PlanId,
+                subscription.EmployeeId);
+
             return View(subscription);
         }
 
-        // 4. حذف اشتراك مباشر مع Modal
-        [HttpPost]
-        public IActionResult Delete(int id)
+        [HttpGet]
+        public IActionResult Edit(int id)
         {
-            var subscription = _db.Subscriptions.Find(id);
+            var subscription = _subscribeService.GetById(id);
+
             if (subscription == null)
             {
                 return NotFound();
             }
 
-            _db.Subscriptions.Remove(subscription);
-            _db.SaveChanges();
+            PopulateDropdowns(
+                subscription.MemberId,
+                subscription.PlanId,
+                subscription.EmployeeId);
+
+            return View(subscription);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(Subscribe subscription)
+        {
+            RemoveNavigationValidation();
+
+            if (ModelState.IsValid)
+            {
+                if (!_subscribeService.Update(subscription))
+                {
+                    return NotFound();
+                }
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            PopulateDropdowns(
+                subscription.MemberId,
+                subscription.PlanId,
+                subscription.EmployeeId);
+
+            return View(subscription);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            if (!_subscribeService.Delete(id))
+            {
+                return NotFound();
+            }
+
             return RedirectToAction(nameof(Index));
         }
 
-        // دالة مساعدة لتعبئة القوائم المنسدلة الثلاث (SelectList)
-        private void PopulateDropdowns()
+        private void RemoveNavigationValidation()
         {
-            ViewBag.Members = new SelectList(_db.Members.ToList(), "Id", "Name");
-            ViewBag.Plans = new SelectList(_db.Plans.ToList(), "Id", "Name");
-            ViewBag.Employees = new SelectList(_db.Employees.ToList(), "Id", "Name");
+            // الفورم يرسل أرقام العلاقات فقط.
+            ModelState.Remove(nameof(Subscribe.Member));
+            ModelState.Remove(nameof(Subscribe.Plan));
+            ModelState.Remove(nameof(Subscribe.Employee));
+        }
+
+        private void PopulateDropdowns(
+            int? memberId = null,
+            int? planId = null,
+            int? employeeId = null)
+        {
+            ViewBag.Members = new SelectList(
+                _subscribeService.GetAllMembers(),
+                "Id",
+                "Name",
+                memberId);
+
+            ViewBag.Plans = new SelectList(
+                _subscribeService.GetAllPlans(),
+                "Id",
+                "Name",
+                planId);
+
+            ViewBag.Employees = new SelectList(
+                _subscribeService.GetAllEmployees(),
+                "Id",
+                "Name",
+                employeeId);
         }
     }
 }
