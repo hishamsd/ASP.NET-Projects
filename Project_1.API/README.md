@@ -31,4 +31,4 @@
 
 الصلاحيات تُقرأ عند تسجيل الدخول؛ بعد تعديل أدوار المستخدم سجّل الخروج والدخول من جديد.
 
-تمت مطابقة EmployeesController وWeatherForecastController مع الكود الذي أرسله المستخدم. مثال الأسماء في `GET /WeatherForecast/names` ومثال الطقس في `GET /WeatherForecast/weather` متاحان دون دخول؛ بياناتهما تجريبية ثابتة/عشوائية ولا يقرآن قاعدة بيانات النادي. لم يُرسل Program.cs الخاص بالمدرب؛ إعداد التشغيل هنا خاص بالمشروع.
+تمت مطابقة EmployeesController وWeatherForecastController مع الكود الذي أرسله المستخدم. مثال الأسماء في `GET /WeatherForecast/names` ومثال الطقس في `GET /WeatherForecast/weather` متاحان دون دخول؛ بياناتهما تجريبية ثابتة/عشوائية ولا يقرآن قاعدة بيانات النادي. تمت مراجعة Program.cs وملف المشروع وWeatherForecast.cs مقابل ملفات المدرب المرسلة. ملف المشروع يستخدم .NET 8 وSwashbuckle 6.6.2 ومرجع Application فقط، مثل المدرب؛ مراجع Infrastructure وDomain تأتي عبر Application. Program.cs يسجل DbContext وUnitOfWork وEmployeeService وControllers وSwagger بالترتيب نفسه، مع إبقاء إعدادات الدخول والصلاحيات وحماية طلب الإضافة وخدمة الصور الخاصة بمشروع النادي.
