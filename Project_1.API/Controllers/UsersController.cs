@@ -1,9 +1,9 @@
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Project_1.API.Filters;
 using Project_1.Application.Dtos.UsersDtos;
 using Project_1.Application.Services.Base;
 
@@ -11,7 +11,6 @@ namespace Project_1.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [ServiceFilter(typeof(MobileExceptionFilter))]
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -26,49 +25,56 @@ namespace Project_1.API.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
-            bool userFound = _userService.Login(loginDto);
-
-            if (userFound)
+            try
             {
-                var session = _userService.GetSession(loginDto.Username)!;
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.NameIdentifier, session.UserId.ToString()),
-                    new Claim(ClaimTypes.Name, session.Name)
-                };
+                bool userFound = _userService.Login(loginDto);
 
-                foreach (var role in session.Roles)
+                if (userFound)
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, role));
+                    var session = _userService.GetSession(loginDto.Username)!;
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, session.UserId.ToString()),
+                        new Claim(ClaimTypes.Name, session.Name)
+                    };
+
+                    foreach (var role in session.Roles)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, role));
+                    }
+
+                    foreach (var permission in session.Permissions)
+                    {
+                        claims.Add(new Claim("Permission", permission));
+                    }
+
+                    var identity = new ClaimsIdentity(
+                        claims,
+                        CookieAuthenticationDefaults.AuthenticationScheme);
+
+                    var principal = new ClaimsPrincipal(identity);
+
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme,
+                        principal);
+
+                    return Ok(new
+                    {
+                        message = "Login Successful",
+                        userId = session.UserId
+                    });
                 }
-
-                foreach (var permission in session.Permissions)
+                else
                 {
-                    claims.Add(new Claim("Permission", permission));
+                    return Unauthorized(new
+                    {
+                        message = "Invalid username or password"
+                    });
                 }
-
-                var identity = new ClaimsIdentity(
-                    claims,
-                    CookieAuthenticationDefaults.AuthenticationScheme);
-
-                var principal = new ClaimsPrincipal(identity);
-
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    principal);
-
-                return Ok(new
-                {
-                    message = "Login Successful",
-                    userId = session.UserId
-                });
             }
-            else
+            catch (Exception ex)
             {
-                return Unauthorized(new
-                {
-                    message = "Invalid username or password"
-                });
+                return HandleException(ex);
             }
         }
 
@@ -77,54 +83,68 @@ namespace Project_1.API.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Register([FromBody] RegisterDto registerDto)
         {
-            if (string.IsNullOrWhiteSpace(registerDto.Name) ||
-                string.IsNullOrWhiteSpace(registerDto.Email) ||
-                string.IsNullOrWhiteSpace(registerDto.Username) ||
-                string.IsNullOrWhiteSpace(registerDto.Password))
+            try
             {
-                return BadRequest(new
+                if (string.IsNullOrWhiteSpace(registerDto.Name) ||
+                    string.IsNullOrWhiteSpace(registerDto.Email) ||
+                    string.IsNullOrWhiteSpace(registerDto.Username) ||
+                    string.IsNullOrWhiteSpace(registerDto.Password))
                 {
-                    message = "All fields are required"
+                    return BadRequest(new
+                    {
+                        message = "All fields are required"
+                    });
+                }
+
+                if (registerDto.Password.Length < 6)
+                {
+                    return BadRequest(new
+                    {
+                        message = "Password must be at least 6 characters"
+                    });
+                }
+
+                bool isRegistered = _userService.Register(registerDto);
+
+                if (isRegistered)
+                {
+                    return Ok(new
+                    {
+                        message = "Registration Successful"
+                    });
+                }
+
+                return Conflict(new
+                {
+                    message = "Username or Email already exists"
                 });
             }
-
-            if (registerDto.Password.Length < 6)
+            catch (Exception ex)
             {
-                return BadRequest(new
-                {
-                    message = "Password must be at least 6 characters"
-                });
+                return HandleException(ex);
             }
-
-            bool isRegistered = _userService.Register(registerDto);
-
-            if (isRegistered)
-            {
-                return Ok(new
-                {
-                    message = "Registration Successful"
-                });
-            }
-
-            return Conflict(new
-            {
-                message = "Username or Email already exists"
-            });
         }
 
         [Authorize]
         [HttpGet("profile")]
         public IActionResult Profile()
         {
-            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var profile = _userService.GetProfile(userId);
-
-            if (profile == null)
+            try
             {
-                return NotFound();
-            }
+                int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var profile = _userService.GetProfile(userId);
 
-            return Ok(profile);
+                if (profile == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(profile);
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
         }
 
         [Authorize]
@@ -132,15 +152,56 @@ namespace Project_1.API.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult UpdateProfile([FromBody] UpdateProfileDto dto)
         {
-            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            bool isUpdated = _userService.UpdateProfile(userId, dto);
-
-            if (!isUpdated)
+            try
             {
-                return NotFound();
+                int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                bool isUpdated = _userService.UpdateProfile(userId, dto);
+
+                if (!isUpdated)
+                {
+                    return NotFound();
+                }
+
+                return Ok(new { message = "Profile Updated" });
+            }
+            catch (Exception ex)
+            {
+                return HandleException(ex);
+            }
+        }
+
+        private IActionResult HandleException(Exception exception)
+        {
+            if (exception is KeyNotFoundException)
+            {
+                return NotFound(new { message = exception.Message });
             }
 
-            return Ok(new { message = "Profile Updated" });
+            if (exception is ArgumentException)
+            {
+                return BadRequest(new { message = exception.Message });
+            }
+
+            if (exception is InvalidOperationException)
+            {
+                return Conflict(new { message = exception.Message });
+            }
+
+            if (exception is DbUpdateConcurrencyException)
+            {
+                return Conflict(new { message = "Data changed. Reload before trying again." });
+            }
+
+            if (exception is DbUpdateException)
+            {
+                return Conflict(new { message = "The operation conflicts with existing data. Reload and try again." });
+            }
+
+            var logger = HttpContext.RequestServices.GetRequiredService<ILogger<UsersController>>();
+            logger.LogError(exception, "Mobile API request failed");
+
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new { message = "Unable to complete the request." });
         }
     }
 }

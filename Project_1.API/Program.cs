@@ -17,7 +17,6 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IPlanService, PlanService>();
 builder.Services.AddScoped<ISubscribeService, SubscribeService>();
-builder.Services.AddScoped<Project_1.API.Filters.MobileExceptionFilter>();
 
 builder.Services.AddControllers();
 // Register the antiforgery filters used by authenticated API writes.
