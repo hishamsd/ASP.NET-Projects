@@ -24,81 +24,160 @@ namespace Project_1.Application.Services
         public bool Login(LoginDto loginDto)
         {
             var user = _unitOfWork.UserRepo.GetByUsername(loginDto.Username.Trim());
-            return user != null && !string.IsNullOrWhiteSpace(user.HashPassword)
-                && BCrypt.Net.BCrypt.Verify(loginDto.Password, user.HashPassword);
+
+            if (user == null || string.IsNullOrWhiteSpace(user.HashPassword))
+            {
+                return false;
+            }
+
+            bool userFound = BCrypt.Net.BCrypt.Verify(
+                loginDto.Password,
+                user.HashPassword);
+
+            return userFound;
         }
 
-        public bool Register(RegisterDto dto)
+        public bool Register(RegisterDto registerDto)
         {
-            if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Email)
-                || string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password)
-                || dto.Password.Length < 6)
+            if (string.IsNullOrWhiteSpace(registerDto.Name) ||
+                string.IsNullOrWhiteSpace(registerDto.Email) ||
+                string.IsNullOrWhiteSpace(registerDto.Username) ||
+                string.IsNullOrWhiteSpace(registerDto.Password) ||
+                registerDto.Password.Length < 6)
+            {
                 throw new ArgumentException("All fields are required; password must be at least 6 characters.");
-            var username = dto.Username.Trim();
-            var email = dto.Email.Trim();
-            if (_unitOfWork.UserRepo.GetByUsername(username) != null
-                || _unitOfWork.UserRepo.GetByEmail(email) != null)
+            }
+
+            var username = registerDto.Username.Trim();
+            var email = registerDto.Email.Trim();
+
+            var existingUsername = _unitOfWork.UserRepo.GetByUsername(username);
+            var existingEmail = _unitOfWork.UserRepo.GetByEmail(email);
+
+            if (existingUsername != null || existingEmail != null)
+            {
                 return false;
+            }
+
             var user = new User
             {
-                Name = dto.Name.Trim(), Email = email, Username = username, Phone = dto.Phone.Trim(),
-                Password = "", HashPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password)
+                Name = registerDto.Name.Trim(),
+                Email = email,
+                Username = username,
+                Phone = registerDto.Phone.Trim(),
+                Password = "",
+                HashPassword = BCrypt.Net.BCrypt.HashPassword(registerDto.Password)
             };
-            _unitOfWork.UserRepo.Add(user);
-            _unitOfWork.MemberRepo.Add(new Member
+
+            var member = new Member
             {
-                Name = user.Name, PhoneNumber = user.Phone, User = user
-            });
-            // Both records are saved together; public registration assigns no staff roles.
+                Name = user.Name,
+                PhoneNumber = user.Phone,
+                User = user
+            };
+
+            _unitOfWork.UserRepo.Add(user);
+            _unitOfWork.MemberRepo.Add(member);
             _unitOfWork.Save();
+
             return true;
         }
 
         public UserSessionDto? GetSession(string username)
         {
             var user = _unitOfWork.UserRepo.GetByUsername(username.Trim());
-            if (user == null) return null;
-            var roles = _unitOfWork.UserRepo.GetUserRoleIds(user.Id)
-                .Select(id => _unitOfWork.RoleRepo.GetByIdWithPermissions(id))
-                .Where(role => role != null).ToList();
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            var roleIds = _unitOfWork.UserRepo.GetUserRoleIds(user.Id);
+            var roles = new List<Role>();
+
+            foreach (var roleId in roleIds)
+            {
+                var role = _unitOfWork.RoleRepo.GetByIdWithPermissions(roleId);
+
+                if (role != null)
+                {
+                    roles.Add(role);
+                }
+            }
+
+            var roleNames = roles
+                .Select(role => role.Name)
+                .Distinct()
+                .ToArray();
+
+            var permissions = roles
+                .SelectMany(role => role.Permissions)
+                .Select(permission => permission.Name)
+                .Distinct()
+                .ToArray();
+
             return new UserSessionDto
             {
-                UserId = user.Id, Name = user.Name,
-                Roles = roles.Select(role => role!.Name).Distinct().ToArray(),
-                Permissions = roles.SelectMany(role => role!.Permissions)
-                    .Select(permission => permission.Name).Distinct().ToArray()
+                UserId = user.Id,
+                Name = user.Name,
+                Roles = roleNames,
+                Permissions = permissions
             };
         }
 
         public ProfileDto? GetProfile(int userId)
         {
             var user = _unitOfWork.UserRepo.GetById(userId);
-            if (user == null) return null;
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            var member = _unitOfWork.MemberRepo.GetByUserId(userId);
+
             return new ProfileDto
             {
-                UserId = user.Id, MemberId = _unitOfWork.MemberRepo.GetByUserId(userId)?.Id,
-                Name = user.Name, Username = user.Username, Email = user.Email,
-                Phone = user.Phone, ImageURL = user.ImageURL
+                UserId = user.Id,
+                MemberId = member?.Id,
+                Name = user.Name,
+                Username = user.Username,
+                Email = user.Email,
+                Phone = user.Phone,
+                ImageURL = user.ImageURL
             };
         }
 
         public bool UpdateProfile(int userId, UpdateProfileDto dto)
         {
             var user = _unitOfWork.UserRepo.GetById(userId);
-            if (user == null) return false;
+
+            if (user == null)
+            {
+                return false;
+            }
+
             var existingEmail = _unitOfWork.UserRepo.GetByEmail(dto.Email.Trim());
+
             if (existingEmail != null && existingEmail.Id != userId)
+            {
                 throw new InvalidOperationException("Email already exists.");
+            }
+
             user.Name = dto.Name.Trim();
             user.Email = dto.Email.Trim();
             user.Phone = dto.Phone.Trim();
+
             var member = _unitOfWork.MemberRepo.GetByUserId(userId);
+
             if (member != null)
             {
                 member.Name = user.Name;
                 member.PhoneNumber = user.Phone;
             }
+
             _unitOfWork.Save();
+
             return true;
         }
 

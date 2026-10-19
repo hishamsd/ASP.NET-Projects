@@ -1,23 +1,41 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_1.Application.Services.Base;
+
 namespace Project_1.API.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class PlansController : ControllerBase
     {
-        private readonly IMobileCatalogService _service;
-        public PlansController(IMobileCatalogService service) { _service = service; }
+        private readonly IPlanService _planService;
+
+        public PlansController(IPlanService planService)
+        {
+            _planService = planService;
+        }
+
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult GetPlans([FromQuery] int? categoryId) => Ok(_service.GetPlans(categoryId));
+        public async Task<IActionResult> GetPlans([FromQuery] int? categoryId)
+        {
+            var plans = await _planService.GetPlansAsync(categoryId);
+
+            return Ok(plans);
+        }
+
         [AllowAnonymous]
         [HttpGet("{id:int}")]
-        public IActionResult GetPlan(int id)
+        public async Task<IActionResult> GetPlan(int id)
         {
-            var plan = _service.GetPlan(id);
-            return plan == null ? NotFound() : Ok(plan);
+            var plan = await _planService.GetPlanAsync(id);
+
+            if (plan == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(plan);
         }
     }
 }

@@ -4,6 +4,6 @@ namespace Project_1.Infrastructure.Repositories.Base
 {
     public interface IPlanRepository : IRepository<Plan>
     {
-        IEnumerable<Plan> GetByCategory(int? categoryId);
+        Task<List<Plan>> GetByCategoryAsync(int? categoryId);
     }
 }

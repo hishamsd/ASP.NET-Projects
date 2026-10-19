@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Project_1.Application.Dtos.HRDtos;
 using Project_1.Domain.Models;
@@ -18,6 +18,18 @@ namespace Project_1.Application.Services
         {
             _unitOfWork = unitOfWork;
             _environment = environment;
+        }
+
+        public async Task<List<TrainerDto>> GetTrainersAsync()
+        {
+            var trainers = await _unitOfWork.EmployeeRepo.GetTrainersAsync();
+
+            return trainers.Select(employee => new TrainerDto
+            {
+                EmployeeId = employee.Id,
+                Name = employee.Name,
+                ImageURL = employee.ImageURL
+            }).ToList();
         }
 
         public IEnumerable<EmployeeDto> GetEmployeesImprove()

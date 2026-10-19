@@ -8,12 +8,22 @@ namespace Project_1.Infrastructure.Repositories
     public class CartRepository : Repository<CartItem>, ICartRepository
     {
         private readonly AppDbContext _db;
-        public CartRepository(AppDbContext db) : base(db) { _db = db; }
-        public CartItem? GetByUserId(int userId)
+
+        public CartRepository(AppDbContext db) : base(db)
         {
-            return _db.CartItems.Include(item => item.Plan).ThenInclude(plan => plan.Category)
-                .Include(item => item.Employee).ThenInclude(employee => employee.Jobs)
-                .SingleOrDefault(item => item.UserId == userId);
+            _db = db;
+        }
+
+        public async Task<CartItem?> GetByUserIdAsync(int userId)
+        {
+            var item = await _db.CartItems
+                .Include(item => item.Plan)
+                    .ThenInclude(plan => plan.Category)
+                .Include(item => item.Employee)
+                    .ThenInclude(employee => employee.Jobs)
+                .SingleOrDefaultAsync(item => item.UserId == userId);
+
+            return item;
         }
     }
 }

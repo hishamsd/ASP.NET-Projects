@@ -15,5 +15,7 @@ namespace Project_1.Infrastructure.Repositories.Base
         IUserRepository UserRepo { get; }
 
         void Save();
+
+        Task SaveAsync();
     }
 }

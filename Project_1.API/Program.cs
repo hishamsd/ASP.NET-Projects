@@ -13,8 +13,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IMobileCatalogService, MobileCatalogService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IPlanService, PlanService>();
+builder.Services.AddScoped<ISubscribeService, SubscribeService>();
 builder.Services.AddScoped<Project_1.API.Filters.MobileExceptionFilter>();
 
 builder.Services.AddControllers();

@@ -4,8 +4,9 @@ namespace Project_1.Infrastructure.Repositories.Base
 {
     public interface IEmployeeRepository : IRepository<Employee>
     {
-        IEnumerable<Employee> GetTrainers();
-        bool IsTrainer(int employeeId);
+        Task<List<Employee>> GetTrainersAsync();
+
+        Task<bool> IsTrainerAsync(int employeeId);
         IEnumerable<Employee> GetEmployeesWithJobAndDept();
 
         IEnumerable<Employee> GetEmployeesImprove();

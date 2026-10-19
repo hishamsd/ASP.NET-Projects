@@ -1,4 +1,5 @@
-﻿using Project_1.Domain.Models;
+using Project_1.Domain.Models;
+using Project_1.Application.Dtos.GymDtos;
 using Project_1.Infrastructure.Repositories.Base;
 using Project_1.Application.Services.Base;
 
@@ -11,6 +12,33 @@ namespace Project_1.Application.Services
         public SubscribeService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task<List<MobileSubscriptionDto>> GetUserSubscriptionsAsync(int userId)
+        {
+            var member = await _unitOfWork.MemberRepo.GetByUserIdAsync(userId);
+
+            if (member == null)
+            {
+                return new List<MobileSubscriptionDto>();
+            }
+
+            var subscriptions = await _unitOfWork.SubscribeRepo.GetByMemberIdAsync(member.Id);
+            var now = DateTime.Now;
+
+            return subscriptions.Select(subscription => new MobileSubscriptionDto
+            {
+                Id = subscription.Id,
+                MemberId = subscription.MemberId,
+                PlanId = subscription.PlanId,
+                PlanName = subscription.Plan.Name,
+                CategoryName = subscription.Plan.Category?.Name ?? "",
+                EmployeeId = subscription.EmployeeId,
+                EmployeeName = subscription.Employee.Name,
+                StartDate = subscription.StartDate,
+                EndDate = subscription.EndDate,
+                IsActive = subscription.StartDate <= now && subscription.EndDate >= now
+            }).ToList();
         }
 
         public IEnumerable<Subscribe> GetAll()

@@ -15,11 +15,18 @@ namespace Project_1.Infrastructure.Repositories
             _db = db;
         }
 
-        public IEnumerable<Subscribe> GetByMemberId(int memberId)
+        public async Task<List<Subscribe>> GetByMemberIdAsync(int memberId)
         {
-            return _db.Subscriptions.AsNoTracking().Include(item => item.Plan)
-                .ThenInclude(plan => plan.Category).Include(item => item.Employee)
-                .Where(item => item.MemberId == memberId).OrderByDescending(item => item.StartDate).ToList();
+            var subscriptions = await _db.Subscriptions
+                .AsNoTracking()
+                .Include(subscription => subscription.Plan)
+                    .ThenInclude(plan => plan.Category)
+                .Include(subscription => subscription.Employee)
+                .Where(subscription => subscription.MemberId == memberId)
+                .OrderByDescending(subscription => subscription.StartDate)
+                .ToListAsync();
+
+            return subscriptions;
         }
 
         public IEnumerable<Subscribe> GetAllWithDetails()

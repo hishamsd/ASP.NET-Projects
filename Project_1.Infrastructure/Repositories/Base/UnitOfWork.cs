@@ -35,6 +35,11 @@ namespace Project_1.Infrastructure.Repositories.Base
         public ISubscribeRepository SubscribeRepo { get; }
         public IUserRepository UserRepo { get; }
 
+        public async Task SaveAsync()
+        {
+            await _db.SaveChangesAsync();
+        }
+
         public void Save()
         {
             _db.SaveChanges();

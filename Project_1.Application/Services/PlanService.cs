@@ -1,4 +1,5 @@
 using Project_1.Domain.Models;
+using Project_1.Application.Dtos.GymDtos;
 using Project_1.Infrastructure.Repositories.Base;
 using Project_1.Application.Services.Base;
 
@@ -11,6 +12,30 @@ namespace Project_1.Application.Services
         public PlanService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task<List<MobilePlanDto>> GetPlansAsync(int? categoryId)
+        {
+            var plans = await _unitOfWork.PlanRepo.GetByCategoryAsync(categoryId);
+
+            return plans.Select(plan => new MobilePlanDto
+            {
+                Id = plan.Id,
+                Name = plan.Name,
+                Description = plan.Description,
+                Price = plan.Price,
+                DurationMonths = plan.DurationMonths,
+                CategoryId = plan.CategoryId!.Value,
+                CategoryName = plan.Category!.Name
+            }).ToList();
+        }
+
+        public async Task<MobilePlanDto?> GetPlanAsync(int id)
+        {
+            var plans = await GetPlansAsync(null);
+            var plan = plans.FirstOrDefault(plan => plan.Id == id);
+
+            return plan;
         }
 
         public IEnumerable<Plan> GetAll()
@@ -64,9 +89,19 @@ namespace Project_1.Application.Services
         private void Validate(Plan plan)
         {
             if (plan.DurationMonths < 1 || plan.DurationMonths > 120 || plan.Price < 0)
+            {
                 throw new ArgumentException("Duration must be 1 to 120 months and price cannot be negative.");
-            if (plan.CategoryId.HasValue && _unitOfWork.CategoryRepo.GetById(plan.CategoryId.Value) == null)
-                throw new ArgumentException("Category not found.");
+            }
+
+            if (plan.CategoryId.HasValue)
+            {
+                var category = _unitOfWork.CategoryRepo.GetById(plan.CategoryId.Value);
+
+                if (category == null)
+                {
+                    throw new ArgumentException("Category not found.");
+                }
+            }
         }
 
         public bool Delete(int id)

@@ -9,11 +9,22 @@ namespace Project_1.Infrastructure.Repositories
     {
         private readonly AppDbContext _db;
 
-        public IEnumerable<Plan> GetByCategory(int? categoryId)
+        public async Task<List<Plan>> GetByCategoryAsync(int? categoryId)
         {
-            return _db.Plans.AsNoTracking().Include(plan => plan.Category)
-                .Where(plan => plan.CategoryId != null && (!categoryId.HasValue || plan.CategoryId == categoryId))
-                .OrderBy(plan => plan.DurationMonths).ThenBy(plan => plan.Id).ToList();
+            var plans = _db.Plans
+                .AsNoTracking()
+                .Include(plan => plan.Category)
+                .Where(plan => plan.CategoryId != null);
+
+            if (categoryId.HasValue)
+            {
+                plans = plans.Where(plan => plan.CategoryId == categoryId.Value);
+            }
+
+            return await plans
+                .OrderBy(plan => plan.DurationMonths)
+                .ThenBy(plan => plan.Id)
+                .ToListAsync();
         }
 
         public PlanRepository(AppDbContext db) : base(db)

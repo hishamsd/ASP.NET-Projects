@@ -7,12 +7,12 @@ namespace Project_1.Controllers
     public class PlanController : Controller
     {
         private readonly IPlanService _planService;
-        private readonly IMobileCatalogService _catalogService;
+        private readonly ICategoryService _categoryService;
 
-        public PlanController(IPlanService planService, IMobileCatalogService catalogService)
+        public PlanController(IPlanService planService, ICategoryService categoryService)
         {
             _planService = planService;
-            _catalogService = catalogService;
+            _categoryService = categoryService;
         }
 
         [HttpGet]
@@ -80,12 +80,12 @@ namespace Project_1.Controllers
         private void LoadCategories(int? selected = null)
         {
             ViewBag.Categories = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(
-                _catalogService.GetCategories(), "Id", "Name", selected);
+                _categoryService.GetCategories(), "Id", "Name", selected);
         }
 
         private void ValidatePlan(Plan plan)
         {
-            if (plan.CategoryId.HasValue && !_catalogService.GetCategories().Any(category => category.Id == plan.CategoryId))
+            if (plan.CategoryId.HasValue && !_categoryService.GetCategories().Any(category => category.Id == plan.CategoryId))
                 ModelState.AddModelError(nameof(plan.CategoryId), "اختر فئة موجودة.");
         }
 

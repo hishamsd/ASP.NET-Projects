@@ -37,7 +37,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<IPlanService, PlanService>();
 builder.Services.AddScoped<ISubscribeService, SubscribeService>();
-builder.Services.AddScoped<IMobileCatalogService, MobileCatalogService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

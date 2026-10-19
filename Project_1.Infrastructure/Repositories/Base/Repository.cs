@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Project_1.Infrastructure.Data;
 using Project_1.Domain.Models;
 namespace Project_1.Infrastructure.Repositories.Base
@@ -31,6 +31,16 @@ namespace Project_1.Infrastructure.Repositories.Base
         public IEnumerable<T> GetAll()
         {
             return _dbSet.ToList();
+        }
+
+        public async Task<List<T>> GetAllAsync()
+        {
+            return await _dbSet.ToListAsync();
+        }
+
+        public async Task<T?> GetByIdAsync(int id)
+        {
+            return await _dbSet.FindAsync(id);
         }
 
         public T? GetById(int id)

@@ -1,7 +1,10 @@
 # تطبيق الجيم
 
 الـAPI يستخدم نفس طبقات المشروع: Controller → Service → UnitOfWork → Repository → AppDbContext.
-الـDTOs في Application والمودلز في Domain. صفحات MVC والصلاحيات الحالية مستمرة.
+لكل قسم سيرفسه: CategoryService وPlanService وEmployeeService وSubscribeService وCartService.
+استعلامات السلة وقراءة بيانات التطبيق تستخدم async / await، مع بقاء دوال الموقع الحالية.
+الـDTOs في Application والمودلز في Domain.
+كل DTO جديد في ملف مستقل: CartDtos للسلة، CategoryDtos للفئات، HRDtos للمدربين، GymDtos للخطط والاشتراكات، وUsersDtos لبيانات الحساب. صفحات MVC والصلاحيات الحالية مستمرة.
 
 ## تشغيل التحديث
 

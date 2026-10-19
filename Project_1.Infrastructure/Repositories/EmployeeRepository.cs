@@ -14,16 +14,26 @@ namespace Project_1.Infrastructure.Repositories
             _db = db;
         }
 
-        public IEnumerable<Employee> GetTrainers()
+        public async Task<List<Employee>> GetTrainersAsync()
         {
-            return _db.Employees.AsNoTracking().Include(employee => employee.Jobs)
-                .Where(employee => employee.Jobs != null && employee.Jobs.IsTrainer).ToList();
+            var trainers = await _db.Employees
+                .AsNoTracking()
+                .Include(employee => employee.Jobs)
+                .Where(employee => employee.Jobs != null && employee.Jobs.IsTrainer)
+                .ToListAsync();
+
+            return trainers;
         }
 
-        public bool IsTrainer(int employeeId)
+        public async Task<bool> IsTrainerAsync(int employeeId)
         {
-            return _db.Employees.Any(employee => employee.Id == employeeId
-                && employee.Jobs != null && employee.Jobs.IsTrainer);
+            bool trainerExists = await _db.Employees
+                .AnyAsync(employee =>
+                    employee.Id == employeeId &&
+                    employee.Jobs != null &&
+                    employee.Jobs.IsTrainer);
+
+            return trainerExists;
         }
 
         public IEnumerable<Employee> GetEmployeesImprove()

@@ -3,6 +3,6 @@ namespace Project_1.Infrastructure.Repositories.Base
 {
     public interface ICartRepository : IRepository<CartItem>
     {
-        CartItem? GetByUserId(int userId);
+        Task<CartItem?> GetByUserIdAsync(int userId);
     }
 }
