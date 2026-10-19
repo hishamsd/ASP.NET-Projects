@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Project_1.Domain.Models;
 using Project_1.Application.Dtos.GymDtos;
 
@@ -13,9 +14,9 @@ namespace Project_1.Application.Services.Base
 
         Plan? GetById(int id);
 
-        void Create(Plan plan);
+        void Create(Plan plan, IFormFile? image = null);
 
-        bool Update(Plan plan);
+        bool Update(Plan plan, IFormFile? image = null);
 
         bool Delete(int id);
     }

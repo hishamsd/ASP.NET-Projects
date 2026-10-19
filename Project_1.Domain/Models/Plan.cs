@@ -7,6 +7,8 @@ namespace Project_1.Domain.Models
     {
         public int Id { get; set; }
         public string UID { get; set; } = Guid.NewGuid().ToString();
+        public string? ImageURL { get; set; }
+
         public string Name { get; set; }
         [Range(0, double.MaxValue)]
         public decimal Price { get; set; }

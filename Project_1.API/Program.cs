@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Project_1.Application.Services;
 using Project_1.Application.Services.Base;
 using Project_1.Infrastructure.Data;
@@ -78,6 +79,20 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+var mvcImagesPath = Path.GetFullPath(Path.Combine(
+    app.Environment.ContentRootPath,
+    app.Configuration["MvcImagesPath"] ?? "../Project 1/wwwroot/images"));
+
+if (Directory.Exists(mvcImagesPath))
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(mvcImagesPath),
+        RequestPath = "/images"
+    });
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

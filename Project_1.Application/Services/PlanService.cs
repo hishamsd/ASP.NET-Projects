@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Project_1.Domain.Models;
 using Project_1.Application.Dtos.GymDtos;
 using Project_1.Infrastructure.Repositories.Base;
@@ -8,10 +10,12 @@ namespace Project_1.Application.Services
     public class PlanService : IPlanService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IWebHostEnvironment _environment;
 
-        public PlanService(IUnitOfWork unitOfWork)
+        public PlanService(IUnitOfWork unitOfWork, IWebHostEnvironment environment)
         {
             _unitOfWork = unitOfWork;
+            _environment = environment;
         }
 
         public async Task<List<MobilePlanDto>> GetPlansAsync(int? categoryId)
@@ -21,6 +25,7 @@ namespace Project_1.Application.Services
             return plans.Select(plan => new MobilePlanDto
             {
                 Id = plan.Id,
+                ImageURL = plan.ImageURL,
                 Name = plan.Name,
                 Description = plan.Description,
                 Price = plan.Price,
@@ -48,7 +53,7 @@ namespace Project_1.Application.Services
             return _unitOfWork.PlanRepo.GetById(id);
         }
 
-        public void Create(Plan plan)
+        public void Create(Plan plan, IFormFile? image = null)
         {
             Validate(plan);
             var newPlan = new Plan
@@ -60,11 +65,16 @@ namespace Project_1.Application.Services
                 DurationMonths = plan.DurationMonths
             };
 
+            if (image != null)
+            {
+                newPlan.ImageURL = UploadImage(image);
+            }
+
             _unitOfWork.PlanRepo.Add(newPlan);
             _unitOfWork.Save();
         }
 
-        public bool Update(Plan plan)
+        public bool Update(Plan plan, IFormFile? image = null)
         {
             var existingPlan =
                 _unitOfWork.PlanRepo.GetById(plan.Id);
@@ -75,6 +85,12 @@ namespace Project_1.Application.Services
             }
 
             Validate(plan);
+
+            if (image != null)
+            {
+                existingPlan.ImageURL = UploadImage(image);
+            }
+
             existingPlan.Name = plan.Name;
             existingPlan.Price = plan.Price;
             existingPlan.Description = plan.Description;
@@ -84,6 +100,36 @@ namespace Project_1.Application.Services
             _unitOfWork.Save();
 
             return true;
+        }
+
+        private string UploadImage(IFormFile image)
+        {
+            if (image.Length == 0 || image.Length > 5 * 1024 * 1024)
+            {
+                throw new ArgumentException("اختر صورة بحجم أكبر من صفر ولا يتجاوز 5 ميجابايت.");
+            }
+
+            var extension = Path.GetExtension(image.FileName).ToLowerInvariant();
+
+            if (extension != ".jpg" && extension != ".jpeg" &&
+                extension != ".png" && extension != ".webp")
+            {
+                throw new ArgumentException("صيغة الصورة يجب أن تكون JPG أو PNG أو WEBP.");
+            }
+
+            var fileName = $"{Guid.NewGuid():N}{extension}";
+            var webRoot = _environment.WebRootPath
+                ?? Path.Combine(_environment.ContentRootPath, "wwwroot");
+
+            var folderPath = Path.Combine(webRoot, "images", "Plans");
+            Directory.CreateDirectory(folderPath);
+
+            using (var stream = new FileStream(Path.Combine(folderPath, fileName), FileMode.CreateNew))
+            {
+                image.CopyTo(stream);
+            }
+
+            return $"/images/Plans/{fileName}";
         }
 
         private void Validate(Plan plan)

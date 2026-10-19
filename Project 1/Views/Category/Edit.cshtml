@@ -1,0 +1,24 @@
+@model Project_1.Application.Dtos.CategoryDtos.CategoryDto
+@{
+    ViewData["Title"] = "تعديل صورة الفئة";
+}
+
+<h1>تعديل صورة @Model.Name</h1>
+
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ImageURL))
+    {
+        <img src="@Model.ImageURL" alt="@Model.Name" width="180" class="mb-3" />
+    }
+
+    <div class="mb-3">
+        <label for="image">صورة الفئة</label>
+        <input id="image" name="image" type="file" accept=".jpg,.jpeg,.png,.webp" class="form-control" />
+        <span class="text-danger">@Html.ValidationMessage("image")</span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">حفظ</button>
+    <a asp-action="Index" class="btn btn-secondary">رجوع</a>
+</form>

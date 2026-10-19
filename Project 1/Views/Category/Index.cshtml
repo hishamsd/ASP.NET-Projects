@@ -1,0 +1,35 @@
+@model IEnumerable<Project_1.Application.Dtos.CategoryDtos.CategoryDto>
+@{
+    ViewData["Title"] = "فئات النادي";
+}
+
+<h1>فئات النادي</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>الصورة</th>
+            <th>الفئة</th>
+            <th>المزايا</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td>
+                    @if (!string.IsNullOrWhiteSpace(category.ImageURL))
+                    {
+                        <img src="@category.ImageURL" alt="@category.Name" width="100" />
+                    }
+                </td>
+                <td>@category.Name</td>
+                <td>@category.Description</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-warning">تعديل الصورة</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

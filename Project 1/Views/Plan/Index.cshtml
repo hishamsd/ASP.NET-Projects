@@ -1,4 +1,4 @@
-﻿@using Project_1.Domain.Models
+@using Project_1.Domain.Models
 @model IEnumerable<Plan>
 
 @{
@@ -24,6 +24,7 @@
         <thead>
             <tr>
                 <th>ID</th>
+                <th>الصورة</th>
                 <th>Name</th>
                 <th>Price</th>
                 <th>Description</th>
@@ -36,6 +37,12 @@
             {
                 <tr>
                     <td>@name.Id</td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(name.ImageURL))
+                        {
+                            <img src="@name.ImageURL" alt="@name.Name" width="70" />
+                        }
+                    </td>
                     <td>@name.Name</td>
                     <td>@name.Price</td>
                     <td>@name.Description</td>

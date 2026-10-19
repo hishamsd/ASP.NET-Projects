@@ -30,7 +30,7 @@ namespace Project_1.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Plan plan)
+        public IActionResult Create(Plan plan, IFormFile? image)
         {
             ValidatePlan(plan);
             LoadCategories(plan.CategoryId);
@@ -39,9 +39,16 @@ namespace Project_1.Controllers
                 return View(plan);
             }
 
-            _planService.Create(plan);
-
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _planService.Create(plan, image);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError("image", ex.Message);
+                return View(plan);
+            }
         }
 
         [HttpGet]
@@ -60,8 +67,9 @@ namespace Project_1.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Plan plan)
+        public IActionResult Edit(Plan plan, IFormFile? image)
         {
+            plan.ImageURL = _planService.GetById(plan.Id)?.ImageURL;
             ValidatePlan(plan);
             LoadCategories(plan.CategoryId);
             if (!ModelState.IsValid)
@@ -69,12 +77,21 @@ namespace Project_1.Controllers
                 return View(plan);
             }
 
-            if (!_planService.Update(plan))
+            try
             {
-                return NotFound();
-            }
+                if (!_planService.Update(plan, image))
+                {
+                    return NotFound();
+                }
 
-            return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError("image", ex.Message);
+                plan.ImageURL = _planService.GetById(plan.Id)?.ImageURL;
+                return View(plan);
+            }
         }
 
         private void LoadCategories(int? selected = null)

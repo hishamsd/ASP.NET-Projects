@@ -8,7 +8,7 @@
 <div class="container">
     <div asp-validation-summary="All" class="text-danger"></div>
 
-    <form asp-action="Create" method="post">
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
         <div class="form-group">
             <label class="control-label">Name</label>
             <input asp-for="Name" class="form-control" />
@@ -26,6 +26,11 @@
         <div class="form-group">
             <label asp-for="DurationMonths">المدة بالأشهر</label>
             <input asp-for="DurationMonths" type="number" min="1" max="120" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label for="image">صورة الخطة (اختيارية)</label>
+            <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.webp" class="form-control" />
+            <span class="text-danger">@Html.ValidationMessage("image")</span>
         </div>
         <div class="form-group">
             <label class="control-label">Description</label>
