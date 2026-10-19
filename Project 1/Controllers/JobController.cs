@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Project_1.Application.Dtos.HRDtos;
 using Project_1.Application.Services.Base;
@@ -104,6 +104,7 @@ namespace Project_1.Controllers
 
             job.Name = dto.Name;
             job.DepartmentId = dto.DepartmentId;
+            job.IsTrainer = dto.IsTrainer;
 
             LoadDepartments(dto.DepartmentId);
 

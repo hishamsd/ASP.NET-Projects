@@ -1,4 +1,4 @@
-﻿@using Project_1.Application.Dtos.HRDtos
+@using Project_1.Application.Dtos.HRDtos
 @model JobDto
 
 @{
@@ -36,6 +36,11 @@
 
         <span asp-validation-for="DepartmentId"
               class="text-danger"></span>
+    </div>
+
+    <div class="mb-3 form-check">
+        <input asp-for="IsTrainer" class="form-check-input" />
+        <label asp-for="IsTrainer" class="form-check-label">وظيفة مدرب (تظهر في التطبيق)</label>
     </div>
 
     <button type="submit" class="btn btn-warning">

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Project_1.Domain.Models
 {
@@ -11,6 +11,7 @@ namespace Project_1.Domain.Models
 
         [Required]
         public string Name { get; set; }
+        public bool IsTrainer { get; set; }
         public int? DepartmentId { get; set; }
 
         public Department? Department { get; set; }

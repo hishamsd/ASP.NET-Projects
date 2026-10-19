@@ -12,6 +12,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMobileCatalogService, MobileCatalogService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<Project_1.API.Filters.MobileExceptionFilter>();
 
 builder.Services.AddControllers();
 // Register the antiforgery filters used by authenticated API writes.

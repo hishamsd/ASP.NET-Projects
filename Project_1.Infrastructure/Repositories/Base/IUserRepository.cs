@@ -1,10 +1,11 @@
-﻿using Project_1.Domain.Models;
+using Project_1.Domain.Models;
 
 namespace Project_1.Infrastructure.Repositories.Base
 {
     public interface IUserRepository : IRepository<User>
     {
         User? GetByUsername(string username);
+        User? GetByEmail(string email);
 
         User? GetByUid(string uid);
 

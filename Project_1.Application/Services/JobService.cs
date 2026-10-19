@@ -1,4 +1,4 @@
-﻿using Project_1.Application.Dtos.HRDtos;
+using Project_1.Application.Dtos.HRDtos;
 using Project_1.Domain.Models;
 using Project_1.Infrastructure.Repositories.Base;
 using Project_1.Application.Services.Base;
@@ -22,7 +22,8 @@ namespace Project_1.Application.Services
                     Id = job.Id,
                     UID = job.UID,
                     Name = job.Name,
-                    DepartmentId = job.DepartmentId
+                    DepartmentId = job.DepartmentId,
+                    IsTrainer = job.IsTrainer
                 })
                 .ToList();
         }
@@ -41,7 +42,8 @@ namespace Project_1.Application.Services
                 Id = job.Id,
                 UID = job.UID,
                 Name = job.Name,
-                DepartmentId = job.DepartmentId
+                DepartmentId = job.DepartmentId,
+                IsTrainer = job.IsTrainer
             };
         }
 
@@ -57,7 +59,8 @@ namespace Project_1.Application.Services
             var job = new Job
             {
                 Name = dto.Name.Trim(),
-                DepartmentId = dto.DepartmentId
+                DepartmentId = dto.DepartmentId,
+                IsTrainer = dto.IsTrainer
             };
 
             _unitOfWork.JobRepo.Add(job);
@@ -77,6 +80,7 @@ namespace Project_1.Application.Services
 
             job.Name = dto.Name.Trim();
             job.DepartmentId = dto.DepartmentId;
+            job.IsTrainer = dto.IsTrainer;
 
             _unitOfWork.Save();
 

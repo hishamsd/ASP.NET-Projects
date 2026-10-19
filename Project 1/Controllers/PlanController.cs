@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Project_1.Domain.Models;
 using Project_1.Application.Services.Base;
 
@@ -7,10 +7,12 @@ namespace Project_1.Controllers
     public class PlanController : Controller
     {
         private readonly IPlanService _planService;
+        private readonly IMobileCatalogService _catalogService;
 
-        public PlanController(IPlanService planService)
+        public PlanController(IPlanService planService, IMobileCatalogService catalogService)
         {
             _planService = planService;
+            _catalogService = catalogService;
         }
 
         [HttpGet]
@@ -22,6 +24,7 @@ namespace Project_1.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            LoadCategories();
             return View(new Plan());
         }
 
@@ -29,6 +32,8 @@ namespace Project_1.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Plan plan)
         {
+            ValidatePlan(plan);
+            LoadCategories(plan.CategoryId);
             if (!ModelState.IsValid)
             {
                 return View(plan);
@@ -49,6 +54,7 @@ namespace Project_1.Controllers
                 return NotFound();
             }
 
+            LoadCategories(plan.CategoryId);
             return View(plan);
         }
 
@@ -56,6 +62,8 @@ namespace Project_1.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(Plan plan)
         {
+            ValidatePlan(plan);
+            LoadCategories(plan.CategoryId);
             if (!ModelState.IsValid)
             {
                 return View(plan);
@@ -67,6 +75,18 @@ namespace Project_1.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private void LoadCategories(int? selected = null)
+        {
+            ViewBag.Categories = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(
+                _catalogService.GetCategories(), "Id", "Name", selected);
+        }
+
+        private void ValidatePlan(Plan plan)
+        {
+            if (plan.CategoryId.HasValue && !_catalogService.GetCategories().Any(category => category.Id == plan.CategoryId))
+                ModelState.AddModelError(nameof(plan.CategoryId), "اختر فئة موجودة.");
         }
 
         [HttpGet]

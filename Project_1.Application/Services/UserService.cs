@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Project_1.Application.Dtos;
 using Project_1.Application.Dtos.UsersDtos;
@@ -19,6 +19,87 @@ namespace Project_1.Application.Services
         {
             _unitOfWork = unitOfWork;
             _environment = environment;
+        }
+
+        public bool Login(LoginDto loginDto)
+        {
+            var user = _unitOfWork.UserRepo.GetByUsername(loginDto.Username.Trim());
+            return user != null && !string.IsNullOrWhiteSpace(user.HashPassword)
+                && BCrypt.Net.BCrypt.Verify(loginDto.Password, user.HashPassword);
+        }
+
+        public bool Register(RegisterDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Name) || string.IsNullOrWhiteSpace(dto.Email)
+                || string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password)
+                || dto.Password.Length < 6)
+                throw new ArgumentException("All fields are required; password must be at least 6 characters.");
+            var username = dto.Username.Trim();
+            var email = dto.Email.Trim();
+            if (_unitOfWork.UserRepo.GetByUsername(username) != null
+                || _unitOfWork.UserRepo.GetByEmail(email) != null)
+                return false;
+            var user = new User
+            {
+                Name = dto.Name.Trim(), Email = email, Username = username, Phone = dto.Phone.Trim(),
+                Password = "", HashPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password)
+            };
+            _unitOfWork.UserRepo.Add(user);
+            _unitOfWork.MemberRepo.Add(new Member
+            {
+                Name = user.Name, PhoneNumber = user.Phone, User = user
+            });
+            // Both records are saved together; public registration assigns no staff roles.
+            _unitOfWork.Save();
+            return true;
+        }
+
+        public UserSessionDto? GetSession(string username)
+        {
+            var user = _unitOfWork.UserRepo.GetByUsername(username.Trim());
+            if (user == null) return null;
+            var roles = _unitOfWork.UserRepo.GetUserRoleIds(user.Id)
+                .Select(id => _unitOfWork.RoleRepo.GetByIdWithPermissions(id))
+                .Where(role => role != null).ToList();
+            return new UserSessionDto
+            {
+                UserId = user.Id, Name = user.Name,
+                Roles = roles.Select(role => role!.Name).Distinct().ToArray(),
+                Permissions = roles.SelectMany(role => role!.Permissions)
+                    .Select(permission => permission.Name).Distinct().ToArray()
+            };
+        }
+
+        public ProfileDto? GetProfile(int userId)
+        {
+            var user = _unitOfWork.UserRepo.GetById(userId);
+            if (user == null) return null;
+            return new ProfileDto
+            {
+                UserId = user.Id, MemberId = _unitOfWork.MemberRepo.GetByUserId(userId)?.Id,
+                Name = user.Name, Username = user.Username, Email = user.Email,
+                Phone = user.Phone, ImageURL = user.ImageURL
+            };
+        }
+
+        public bool UpdateProfile(int userId, UpdateProfileDto dto)
+        {
+            var user = _unitOfWork.UserRepo.GetById(userId);
+            if (user == null) return false;
+            var existingEmail = _unitOfWork.UserRepo.GetByEmail(dto.Email.Trim());
+            if (existingEmail != null && existingEmail.Id != userId)
+                throw new InvalidOperationException("Email already exists.");
+            user.Name = dto.Name.Trim();
+            user.Email = dto.Email.Trim();
+            user.Phone = dto.Phone.Trim();
+            var member = _unitOfWork.MemberRepo.GetByUserId(userId);
+            if (member != null)
+            {
+                member.Name = user.Name;
+                member.PhoneNumber = user.Phone;
+            }
+            _unitOfWork.Save();
+            return true;
         }
 
         public IEnumerable<UserDto> GetAll()
@@ -69,7 +150,7 @@ namespace Project_1.Application.Services
                 Email = userDto.Email,
                 Phone = userDto.Phone,
                 Username = userDto.Username,
-                Password = userDto.Password,
+                Password = "",
                 HashPassword =
                     BCrypt.Net.BCrypt.HashPassword(userDto.Password)
             };
@@ -109,7 +190,7 @@ namespace Project_1.Application.Services
 
             if (!string.IsNullOrWhiteSpace(userDto.Password))
             {
-                user.Password = userDto.Password;
+                user.Password = "";
                 user.HashPassword =
                     BCrypt.Net.BCrypt.HashPassword(userDto.Password);
             }

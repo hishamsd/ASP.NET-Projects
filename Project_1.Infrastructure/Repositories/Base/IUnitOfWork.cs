@@ -1,7 +1,9 @@
-﻿namespace Project_1.Infrastructure.Repositories.Base
+namespace Project_1.Infrastructure.Repositories.Base
 {
     public interface IUnitOfWork
     {
+        ICartRepository CartRepo { get; }
+        ICategoryRepository CategoryRepo { get; }
         IDepartmentRepository DepartmentRepo { get; }
         IEmployeeRepository EmployeeRepo { get; }
         IJobRepository JobRepo { get; }

@@ -1,4 +1,4 @@
-﻿using Project_1.Infrastructure.Data;
+using Project_1.Infrastructure.Data;
 using Project_1.Domain.Models;
 using Project_1.Infrastructure.Repositories.Base;
 
@@ -17,6 +17,11 @@ namespace Project_1.Infrastructure.Repositories
         {
             return _db.Users.FirstOrDefault(
                 user => user.Username == username);
+        }
+
+        public User? GetByEmail(string email)
+        {
+            return _db.Users.FirstOrDefault(user => user.Email == email);
         }
 
         public User? GetByUid(string uid)

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Project_1.Domain.Models
 {
@@ -11,7 +11,9 @@ namespace Project_1.Domain.Models
         public string UID { get; set; } = Guid.NewGuid().ToString();
         public string Name { get; set; }
          public string PhoneNumber { get; set; }
-         public int? PlanId { get; set; }
+         public int? UserId { get; set; }
+        public User? User { get; set; }
+        public int? PlanId { get; set; }
          public Plan? Plan { get; set; }
 
 

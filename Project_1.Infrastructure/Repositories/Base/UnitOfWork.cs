@@ -1,4 +1,4 @@
-﻿using Project_1.Infrastructure.Data;
+using Project_1.Infrastructure.Data;
 
 namespace Project_1.Infrastructure.Repositories.Base
 {
@@ -10,6 +10,8 @@ namespace Project_1.Infrastructure.Repositories.Base
         {
             _db = db;
 
+            CartRepo = new CartRepository(db);
+            CategoryRepo = new CategoryRepository(db);
             DepartmentRepo = new DepartmentRepository(db);
             EmployeeRepo = new EmployeeRepository(db);
             JobRepo = new JobRepository(db);
@@ -21,6 +23,8 @@ namespace Project_1.Infrastructure.Repositories.Base
             UserRepo = new UserRepository(db);
         }
 
+        public ICartRepository CartRepo { get; }
+        public ICategoryRepository CategoryRepo { get; }
         public IDepartmentRepository DepartmentRepo { get; }
         public IEmployeeRepository EmployeeRepo { get; }
         public IJobRepository JobRepo { get; }
