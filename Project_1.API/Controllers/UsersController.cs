@@ -22,7 +22,6 @@ namespace Project_1.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
         {
             try
@@ -80,7 +79,6 @@ namespace Project_1.API.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        [ValidateAntiForgeryToken]
         public IActionResult Register([FromBody] RegisterDto registerDto)
         {
             try
@@ -149,7 +147,6 @@ namespace Project_1.API.Controllers
 
         [Authorize]
         [HttpPut("profile")]
-        [ValidateAntiForgeryToken]
         public IActionResult UpdateProfile([FromBody] UpdateProfileDto dto)
         {
             try

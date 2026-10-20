@@ -20,31 +20,8 @@ builder.Services.AddScoped<IPlanService, PlanService>();
 builder.Services.AddScoped<ISubscribeService, SubscribeService>();
 
 builder.Services.AddControllers();
-// Register the antiforgery filters used by authenticated API writes.
-builder.Services.AddMvcCore().AddViews();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.AddSecurityDefinition("CSRF", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-    {
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Name = "X-CSRF-TOKEN",
-        Description = "Get a token from GET /api/auth/csrf. Refresh it after login."
-    });
-    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        [new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-        {
-            Reference = new Microsoft.OpenApi.Models.OpenApiReference
-            {
-                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                Id = "CSRF"
-            }
-        }] = Array.Empty<string>()
-    });
-});
-builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
+builder.Services.AddSwaggerGen();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

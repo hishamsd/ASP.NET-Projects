@@ -36,7 +36,6 @@ namespace Project_1.API.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddToCart([FromBody] AddCartDto dto)
         {
             try
@@ -54,7 +53,6 @@ namespace Project_1.API.Controllers
         }
 
         [HttpDelete]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveFromCart()
         {
             try
@@ -76,7 +74,6 @@ namespace Project_1.API.Controllers
         }
 
         [HttpPost("confirm")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Confirm([FromBody] ConfirmCartDto dto)
         {
             try

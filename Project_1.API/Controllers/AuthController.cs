@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -15,24 +14,13 @@ namespace Project_1.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _db;
-    private readonly IAntiforgery _antiforgery;
-    public AuthController(AppDbContext db, IAntiforgery antiforgery)
+    public AuthController(AppDbContext db)
     {
         _db = db;
-        _antiforgery = antiforgery;
     }
 
     [AllowAnonymous]
-    [HttpGet("csrf")]
-    public IActionResult GetToken() => Ok(new
-    {
-        token = _antiforgery.GetAndStoreTokens(HttpContext).RequestToken,
-        headerName = "X-CSRF-TOKEN"
-    });
-
-    [AllowAnonymous]
     [HttpPost("login")]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginRequest request)
     {
         var user = await _db.Users.FirstOrDefaultAsync(user => user.Username == request.Username);
@@ -62,7 +50,6 @@ public class AuthController : ControllerBase
 
     [Authorize]
     [HttpPost("logout")]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

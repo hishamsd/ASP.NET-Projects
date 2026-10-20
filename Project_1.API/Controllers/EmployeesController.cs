@@ -33,7 +33,6 @@ namespace Project_1.API.Controllers
 
         [HttpPost]
         [Authorize(Policy = "Create")]
-        [ValidateAntiForgeryToken]
         public IActionResult CreateEmployee([FromForm] CreateEmployeeDto createEmployeeDto)
         {
             try
