@@ -1,8 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_1.Application.Dtos.UsersDtos;
 using Project_1.Application.Services.Base;
@@ -20,9 +16,8 @@ namespace Project_1.API.Controllers
             _userService = userService;
         }
 
-        [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        public IActionResult Login([FromBody] LoginDto loginDto)
         {
             try
             {
@@ -30,32 +25,12 @@ namespace Project_1.API.Controllers
 
                 if (userFound)
                 {
-                    var session = _userService.GetSession(loginDto.Username)!;
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.NameIdentifier, session.UserId.ToString()),
-                        new Claim(ClaimTypes.Name, session.Name)
-                    };
+                    var session = _userService.GetSession(loginDto.Username);
 
-                    foreach (var role in session.Roles)
+                    if (session == null)
                     {
-                        claims.Add(new Claim(ClaimTypes.Role, role));
+                        return Unauthorized(new { message = "Invalid username or password" });
                     }
-
-                    foreach (var permission in session.Permissions)
-                    {
-                        claims.Add(new Claim("Permission", permission));
-                    }
-
-                    var identity = new ClaimsIdentity(
-                        claims,
-                        CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    var principal = new ClaimsPrincipal(identity);
-
-                    await HttpContext.SignInAsync(
-                        CookieAuthenticationDefaults.AuthenticationScheme,
-                        principal);
 
                     return Ok(new
                     {
@@ -77,7 +52,6 @@ namespace Project_1.API.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterDto registerDto)
         {
@@ -123,13 +97,15 @@ namespace Project_1.API.Controllers
             }
         }
 
-        [Authorize]
         [HttpGet("profile")]
-        public IActionResult Profile()
+        public IActionResult Profile([FromQuery] int userId)
         {
             try
             {
-                int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                if (userId < 1)
+                {
+                    return BadRequest(new { message = "A valid userId is required." });
+                }
                 var profile = _userService.GetProfile(userId);
 
                 if (profile == null)
@@ -145,13 +121,15 @@ namespace Project_1.API.Controllers
             }
         }
 
-        [Authorize]
         [HttpPut("profile")]
-        public IActionResult UpdateProfile([FromBody] UpdateProfileDto dto)
+        public IActionResult UpdateProfile([FromQuery] int userId, [FromBody] UpdateProfileDto dto)
         {
             try
             {
-                int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                if (userId < 1)
+                {
+                    return BadRequest(new { message = "A valid userId is required." });
+                }
                 bool isUpdated = _userService.UpdateProfile(userId, dto);
 
                 if (!isUpdated)

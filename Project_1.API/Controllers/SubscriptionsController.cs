@@ -1,5 +1,3 @@
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_1.Application.Services.Base;
 
@@ -7,7 +5,6 @@ namespace Project_1.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class SubscriptionsController : ControllerBase
     {
         private readonly ISubscribeService _subscribeService;
@@ -18,9 +15,12 @@ namespace Project_1.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSubscriptions()
+        public async Task<IActionResult> GetSubscriptions([FromQuery] int userId)
         {
-            int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            if (userId < 1)
+            {
+                return BadRequest(new { message = "A valid userId is required." });
+            }
             var subscriptions = await _subscribeService.GetUserSubscriptionsAsync(userId);
 
             return Ok(subscriptions);

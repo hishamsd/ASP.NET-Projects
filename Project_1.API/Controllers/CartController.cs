@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Project_1.Application.Dtos.CartDtos;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_1.Application.Services.Base;
 
@@ -9,7 +7,6 @@ namespace Project_1.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class CartController : ControllerBase
     {
         private readonly ICartService _cartService;
@@ -20,11 +17,14 @@ namespace Project_1.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCart()
+        public async Task<IActionResult> GetCart([FromQuery] int userId)
         {
             try
             {
-                int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                if (userId < 1)
+                {
+                    return BadRequest(new { message = "A valid userId is required." });
+                }
                 var item = await _cartService.GetCartAsync(userId);
 
                 return Ok(new { item = item });
@@ -36,11 +36,14 @@ namespace Project_1.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddToCart([FromBody] AddCartDto dto)
+        public async Task<IActionResult> AddToCart([FromQuery] int userId, [FromBody] AddCartDto dto)
         {
             try
             {
-                int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                if (userId < 1)
+                {
+                    return BadRequest(new { message = "A valid userId is required." });
+                }
 
                 await _cartService.AddToCartAsync(userId, dto);
 
@@ -53,11 +56,14 @@ namespace Project_1.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> RemoveFromCart()
+        public async Task<IActionResult> RemoveFromCart([FromQuery] int userId)
         {
             try
             {
-                int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                if (userId < 1)
+                {
+                    return BadRequest(new { message = "A valid userId is required." });
+                }
                 bool isRemoved = await _cartService.RemoveFromCartAsync(userId);
 
                 if (!isRemoved)
@@ -74,11 +80,14 @@ namespace Project_1.API.Controllers
         }
 
         [HttpPost("confirm")]
-        public async Task<IActionResult> Confirm([FromBody] ConfirmCartDto dto)
+        public async Task<IActionResult> Confirm([FromQuery] int userId, [FromBody] ConfirmCartDto dto)
         {
             try
             {
-                int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                if (userId < 1)
+                {
+                    return BadRequest(new { message = "A valid userId is required." });
+                }
                 var subscription = await _cartService.ConfirmAsync(userId, dto);
 
                 return Ok(subscription);

@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Project_1.Application.Dtos.HRDtos;
 using Project_1.Application.Services.Base;
@@ -17,7 +16,6 @@ namespace Project_1.API.Controllers
         }
 
         [HttpGet("GetEmployees")]
-        [Authorize(Policy = "Read")]
         public IActionResult Emp(string? name = null)
         {
             try
@@ -32,7 +30,6 @@ namespace Project_1.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "Create")]
         public IActionResult CreateEmployee([FromForm] CreateEmployeeDto createEmployeeDto)
         {
             try

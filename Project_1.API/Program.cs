@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Project_1.Application.Services;
@@ -22,32 +21,6 @@ builder.Services.AddScoped<ISubscribeService, SubscribeService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.Cookie.Name = "Project_1.API.Auth";
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SameSite = SameSiteMode.Strict;
-        options.ExpireTimeSpan = TimeSpan.FromHours(8);
-        options.Events.OnRedirectToLogin = context =>
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            return Task.CompletedTask;
-        };
-        options.Events.OnRedirectToAccessDenied = context =>
-        {
-            context.Response.StatusCode = StatusCodes.Status403Forbidden;
-            return Task.CompletedTask;
-        };
-    });
-builder.Services.AddAuthorization(options =>
-{
-    foreach (var permission in new[] { "Read", "Create" })
-    {
-        options.AddPolicy(permission, policy => policy.RequireAuthenticatedUser()
-            .RequireClaim("Permission", "Read").RequireClaim("Permission", permission));
-    }
-});
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
@@ -70,7 +43,5 @@ if (Directory.Exists(mvcImagesPath))
     });
 }
 
-app.UseAuthentication();
-app.UseAuthorization();
 app.MapControllers();
 app.Run();
