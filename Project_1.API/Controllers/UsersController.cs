@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Antiforgery;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -23,7 +24,7 @@ namespace Project_1.API.Controllers
         [AllowAnonymous]
         [HttpPost("login")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginDto, [FromServices] IAntiforgery antiforgery)
         {
             try
             {
@@ -31,7 +32,12 @@ namespace Project_1.API.Controllers
 
                 if (userFound)
                 {
-                    var session = _userService.GetSession(loginDto.Username)!;
+                    var session = _userService.GetSession(loginDto.Username);
+
+                    if (session == null)
+                    {
+                        return Unauthorized(new { message = "Invalid username or password" });
+                    }
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.NameIdentifier, session.UserId.ToString()),
@@ -58,10 +64,16 @@ namespace Project_1.API.Controllers
                         CookieAuthenticationDefaults.AuthenticationScheme,
                         principal);
 
+                    // Create the next token for the signed-in user, not the previous identity.
+                    HttpContext.User = principal;
+                    var tokens = antiforgery.GetAndStoreTokens(HttpContext);
+
                     return Ok(new
                     {
                         message = "Login Successful",
-                        userId = session.UserId
+                        userId = session.UserId,
+                        csrfToken = tokens.RequestToken,
+                        headerName = tokens.HeaderName
                     });
                 }
                 else
