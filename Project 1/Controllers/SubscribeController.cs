@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Project_1.Domain.Models;
 using Project_1.Application.Services.Base;
@@ -34,6 +34,11 @@ namespace Project_1.Controllers
         public IActionResult Create(Subscribe subscription)
         {
             RemoveNavigationValidation();
+
+            if (subscription.EndDate <= subscription.StartDate)
+            {
+                ModelState.AddModelError(nameof(Subscribe.EndDate), "End date must be after start date.");
+            }
 
             if (ModelState.IsValid)
             {
@@ -73,6 +78,11 @@ namespace Project_1.Controllers
         public IActionResult Edit(Subscribe subscription)
         {
             RemoveNavigationValidation();
+
+            if (subscription.EndDate <= subscription.StartDate)
+            {
+                ModelState.AddModelError(nameof(Subscribe.EndDate), "End date must be after start date.");
+            }
 
             if (ModelState.IsValid)
             {

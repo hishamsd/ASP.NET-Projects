@@ -2,16 +2,19 @@ using Project_1.Domain.Models;
 using Project_1.Application.Dtos.GymDtos;
 using Project_1.Infrastructure.Repositories.Base;
 using Project_1.Application.Services.Base;
+using Project_1.Infrastructure.Data;
 
 namespace Project_1.Application.Services
 {
     public class SubscribeService : ISubscribeService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly AppDbContext _db;
 
-        public SubscribeService(IUnitOfWork unitOfWork)
+        public SubscribeService(IUnitOfWork unitOfWork, AppDbContext db)
         {
             _unitOfWork = unitOfWork;
+            _db = db;
         }
 
         public async Task<List<MobileSubscriptionDto>> GetUserSubscriptionsAsync(int userId)
@@ -37,6 +40,8 @@ namespace Project_1.Application.Services
                 EmployeeName = subscription.Employee.Name,
                 StartDate = subscription.StartDate,
                 EndDate = subscription.EndDate,
+                Status = subscription.StartDate > now ? "Upcoming"
+                    : subscription.EndDate < now ? "Expired" : "Active",
                 IsActive = subscription.StartDate <= now && subscription.EndDate >= now
             }).ToList();
         }
@@ -78,6 +83,18 @@ namespace Project_1.Application.Services
             };
 
             _unitOfWork.SubscribeRepo.Add(newSubscription);
+
+            var member = _unitOfWork.MemberRepo.GetById(newSubscription.MemberId);
+            if (member?.UserId != null)
+            {
+                _db.Notifications.Add(new Notification
+                {
+                    UserId = member.UserId.Value,
+                    Subscription = newSubscription,
+                    Title = "Subscription Created",
+                    Message = $"Your subscription starts on {newSubscription.StartDate:yyyy-MM-dd} and ends on {newSubscription.EndDate:yyyy-MM-dd}."
+                });
+            }
             _unitOfWork.Save();
         }
 
@@ -91,11 +108,32 @@ namespace Project_1.Application.Services
                 return false;
             }
 
+            if (existingSubscription.MemberId == subscription.MemberId &&
+                existingSubscription.PlanId == subscription.PlanId &&
+                existingSubscription.EmployeeId == subscription.EmployeeId &&
+                existingSubscription.StartDate == subscription.StartDate &&
+                existingSubscription.EndDate == subscription.EndDate)
+            {
+                return true;
+            }
+
             existingSubscription.MemberId = subscription.MemberId;
             existingSubscription.PlanId = subscription.PlanId;
             existingSubscription.EmployeeId = subscription.EmployeeId;
             existingSubscription.StartDate = subscription.StartDate;
             existingSubscription.EndDate = subscription.EndDate;
+
+            var member = _unitOfWork.MemberRepo.GetById(existingSubscription.MemberId);
+            if (member?.UserId != null)
+            {
+                _db.Notifications.Add(new Notification
+                {
+                    UserId = member.UserId.Value,
+                    Subscription = existingSubscription,
+                    Title = "Subscription Updated",
+                    Message = $"Your subscription has been updated. It starts on {existingSubscription.StartDate:yyyy-MM-dd} and ends on {existingSubscription.EndDate:yyyy-MM-dd}."
+                });
+            }
 
             _unitOfWork.Save();
 

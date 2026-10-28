@@ -34,7 +34,9 @@ namespace Project_1.Infrastructure.Repositories
             return _db.Subscriptions
                 .Include(subscription => subscription.Member)
                 .Include(subscription => subscription.Plan)
+                    .ThenInclude(plan => plan.Category)
                 .Include(subscription => subscription.Employee)
+                .OrderByDescending(subscription => subscription.StartDate)
                 .ToList();
         }
 

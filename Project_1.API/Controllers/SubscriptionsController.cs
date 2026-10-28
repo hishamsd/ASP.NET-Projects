@@ -25,5 +25,11 @@ namespace Project_1.API.Controllers
 
             return Ok(subscriptions);
         }
+
+        [HttpGet("user/{userId:int}")]
+        public Task<IActionResult> GetMySubscriptions(int userId)
+        {
+            return GetSubscriptions(userId);
+        }
     }
 }

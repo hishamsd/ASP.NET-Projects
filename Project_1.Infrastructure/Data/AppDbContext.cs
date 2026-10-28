@@ -10,6 +10,7 @@ namespace Project_1.Infrastructure.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Employee> Employees { get; set; }
@@ -38,6 +39,11 @@ namespace Project_1.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Notification>().HasOne(notification => notification.User).WithMany()
+                .HasForeignKey(notification => notification.UserId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Notification>().HasOne(notification => notification.Subscription).WithMany()
+                .HasForeignKey(notification => notification.SubscriptionId).OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Member>().HasOne(member => member.User)
                 .WithOne().HasForeignKey<Member>(member => member.UserId)

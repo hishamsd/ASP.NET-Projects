@@ -2,6 +2,7 @@ using Project_1.Application.Dtos.CartDtos;
 using Project_1.Application.Dtos.GymDtos;
 using Project_1.Application.Services.Base;
 using Project_1.Domain.Models;
+using Project_1.Infrastructure.Data;
 using Project_1.Infrastructure.Repositories.Base;
 
 namespace Project_1.Application.Services
@@ -9,10 +10,12 @@ namespace Project_1.Application.Services
     public class CartService : ICartService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly AppDbContext _db;
 
-        public CartService(IUnitOfWork unitOfWork)
+        public CartService(IUnitOfWork unitOfWork, AppDbContext db)
         {
             _unitOfWork = unitOfWork;
+            _db = db;
         }
 
         public async Task<CartDto?> GetCartAsync(int userId)
@@ -150,6 +153,14 @@ namespace Project_1.Application.Services
             _unitOfWork.SubscribeRepo.Add(subscription);
             _unitOfWork.CartRepo.Delete(item);
 
+            _db.Notifications.Add(new Notification
+            {
+                UserId = userId,
+                Subscription = subscription,
+                Title = "Subscription Created",
+                Message = $"Your {item.Plan.Name} subscription starts on {subscription.StartDate:yyyy-MM-dd} and ends on {subscription.EndDate:yyyy-MM-dd}."
+            });
+
             // Save the subscription and remove the cart in the same transaction.
             await _unitOfWork.SaveAsync();
 
@@ -164,6 +175,7 @@ namespace Project_1.Application.Services
                 EmployeeName = subscription.Employee.Name,
                 StartDate = subscription.StartDate,
                 EndDate = subscription.EndDate,
+                Status = "Active",
                 IsActive = subscription.StartDate <= now && subscription.EndDate >= now
             };
         }
